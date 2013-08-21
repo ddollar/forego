@@ -1,0 +1,2 @@
+web: bin/web -p $PORT
+worker: bin/worker -n $SIZE
