@@ -9,7 +9,8 @@ import (
 
 var cmdHelp = &Command{
   Usage: "help [topic]",
-  Long:  `Help shows usage for a command or other topic.`,
+  Short: "Show this help",
+  Long:  `Help shows usage for a command.`,
 }
 
 func init() {
@@ -37,9 +38,10 @@ func runHelp(cmd *Command, args []string) {
 }
 
 var usageTemplate = template.Must(template.New("usage").Parse(`
-Usage: forego [command] [options] [arguments]
-{{range .Commands}}{{if .Runnable}}{{if .List}}
-    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
+Usage: foreman <command> [<args>]
+
+Available commands:{{range .Commands}}{{if .Runnable}}{{if .List}}
+   {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
 
 Run 'forego help [command]' for details.`[1:]))
 

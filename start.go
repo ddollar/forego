@@ -11,15 +11,14 @@ var flagEnv string
 var cmdStart = &Command{
   Run: runStart,
   Usage: "start [-f procfile] [-e env] [-c concurrency]",
-  Short: "start the app",
+  Short: "Start the application",
   Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
 
 Examples:
 
-    forego start
-
-    forego start -f Procfile.test -e .env.test
+  forego start
+  forego start -f Procfile.test -e .env.test
 `,
 }
 
