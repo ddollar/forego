@@ -28,7 +28,7 @@ func init() {
 }
 
 func runStart(cmd *Command, args []string) {
-  pf, err := OpenProcfile(flagProcfile)
+  pf, err := ReadProcfile(flagProcfile)
   if err != nil {
     fmt.Println("ERROR:", err)
     return
