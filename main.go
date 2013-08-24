@@ -30,4 +30,5 @@ func main() {
       return
     }
   }
+  usage()
 }
