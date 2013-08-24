@@ -45,7 +45,7 @@ func runStart(cmd *Command, args []string) {
   env, err := ReadEnv(flagEnv)
   handleError(err)
 
-  ps_env := []string{}
+  ps_env := os.Environ()
   for name, val := range env {
     ps_env = append(ps_env, fmt.Sprintf("%s=%s", name, val))
   }
