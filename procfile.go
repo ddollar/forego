@@ -12,8 +12,8 @@ import (
 var procfileEntryRegexp = regexp.MustCompile("^([A-Za-z0-9_]+):\\s*(.+)$")
 
 type ProcfileEntry struct {
-  name string
-  command string
+  Name string
+  Command string
 }
 
 type Procfile struct {

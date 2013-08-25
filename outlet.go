@@ -6,6 +6,7 @@ import (
   "fmt"
   "github.com/daviddengcn/go-colortext"
   "github.com/kr/pretty"
+  "io"
   "sync"
 )
 
@@ -36,7 +37,7 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   scanner := bufio.NewScanner(bytes.NewReader(b))
   for scanner.Scan() {
     formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
-    ct.ChangeColor(o.Color, true, ct.None, true)
+    ct.ChangeColor(o.Color, false, ct.None, false)
     fmt.Printf(formatter, o.Name)
     if (o.IsError) {
       ct.ChangeColor(ct.Red, true, ct.None, true)
@@ -50,6 +51,10 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   return
 }
 
+func ProcessOutput(w io.Writer, str string) {
+  w.Write([]byte(str))
+}
+
 var outlets = map[string]*Outlet{}
 
 func createOutlet(name string, index int, isError bool) *Outlet {
@@ -58,12 +63,21 @@ func createOutlet(name string, index int, isError bool) *Outlet {
 }
 
 func LongestOutletName() (longest int) {
-  // kr? better way to do this?
-  longest = 0
+  // kr?
+  longest = 7 // foreman is the shortest name
   for name, _ := range outlets {
     if len(name) > longest {
       longest = len(name)
     }
   }
   return
+}
+
+func SystemOutput(str string) {
+  ct.ChangeColor(ct.White, true, ct.None, true)
+  formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
+  fmt.Printf(formatter, "foreman")
+  ct.ResetColor()
+  fmt.Println(str)
+  ct.ResetColor()
 }
