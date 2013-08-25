@@ -35,8 +35,9 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   defer mutex.Unlock()
   scanner := bufio.NewScanner(bytes.NewReader(b))
   for scanner.Scan() {
+    formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
     ct.ChangeColor(o.Color, true, ct.None, true)
-    fmt.Printf("%-10s | ", o.Name)
+    fmt.Printf(formatter, o.Name)
     if (o.IsError) {
       ct.ChangeColor(ct.Red, true, ct.None, true)
     } else {
@@ -49,6 +50,20 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   return
 }
 
+var outlets = map[string]*Outlet{}
+
 func createOutlet(name string, index int, isError bool) *Outlet {
-  return &Outlet{name, colors[index%len(colors)], isError}
+  outlets[name] = &Outlet{name, colors[index%len(colors)], isError}
+  return outlets[name]
+}
+
+func LongestOutletName() (longest int) {
+  // kr? better way to do this?
+  longest = 0
+  for name, _ := range outlets {
+    if len(name) > longest {
+      longest = len(name)
+    }
+  }
+  return
 }
