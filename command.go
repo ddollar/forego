@@ -6,6 +6,9 @@ import (
   "strings"
 )
 
+var flagEnv string
+var flagProcfile string
+
 type Command struct {
   // args does not include the command name
   Run  func(cmd *Command, args []string)

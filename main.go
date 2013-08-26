@@ -9,6 +9,7 @@ var _ = pretty.Println // lol
 
 var commands = []*Command{
   cmdStart,
+  cmdRun,
   cmdHelp,
 }
 

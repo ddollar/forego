@@ -5,6 +5,7 @@ import (
   "github.com/kr/pretty"
   "os"
   "os/exec"
+  "os/signal"
   "path/filepath"
   "sync"
   "syscall"
@@ -16,8 +17,6 @@ const shutdownGraceTime = 3 * time.Second
 var _ = pretty.Println // lol
 var _ = os.Stdout
 
-var flagProcfile string
-var flagEnv string
 var flagPort int
 
 var shutdown_mutex = new(sync.Mutex)
@@ -47,10 +46,25 @@ func init() {
 }
 
 func runStart(cmd *Command, args []string) {
+  handler := make(chan os.Signal, 1)
+  signal.Notify(handler, os.Interrupt)
+
+  go func() {
+    for sig := range handler {
+      switch (sig) {
+        case os.Interrupt:
+          fmt.Println("      | ctrl-c detected")
+          go func() { ShutdownProcesses() }()
+        }
+    }
+  }()
+
   root := filepath.Dir(flagProcfile)
+
   if (flagEnv == "") {
     flagEnv = filepath.Join(root, ".env")
   }
+
   pf, err := ReadProcfile(flagProcfile)
   handleError(err)
   env, err := ReadEnv(flagEnv)
@@ -82,6 +96,7 @@ func runStart(cmd *Command, args []string) {
       delete(processes, proc.Name)
     }(proc, ps)
   }
+
   wg.Wait()
   shutdown_mutex.Unlock()
 }
