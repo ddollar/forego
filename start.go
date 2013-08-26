@@ -88,7 +88,7 @@ func runStart(cmd *Command, args []string) {
   for idx, proc := range pf.Entries {
     if (singleton == "") || (singleton == proc.Name) {
       wg.Add(1)
-      command := []string{"/bin/bash", "-c", proc.Command}
+      command := []string{"/bin/bash", "-c", fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(root, ".profile"), proc.Command)}
       ps := exec.Command(command[0], command[1:]...)
       port := flagPort + (idx * 100)
       processes[proc.Name] = ps

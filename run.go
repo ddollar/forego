@@ -5,6 +5,7 @@ import (
   "github.com/kr/pretty"
   "os"
   "os/exec"
+  "strings"
   "syscall"
 )
 
@@ -29,10 +30,8 @@ func init() {
 }
 
 func runRun(cmd *Command, args []string) {
-  base := []string{"/bin/bash", "-c"}
-  command := make([]string, len(base)+len(args))
-  copy(command, base)
-  copy(command[len(base):], args)
+  command := []string{"/bin/bash", "-c"}
+  command = append(command, fmt.Sprintf("source .profile 2>/dev/null; %s", strings.Join(args, " ")))
 
   env, err := ReadEnv(flagEnv)
   handleError(err)
