@@ -43,7 +43,8 @@ Usage: foreman <command> [<args>]
 Available commands:{{range .Commands}}{{if .Runnable}}{{if .List}}
    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}
 
-Run 'forego help [command]' for details.`[1:]))
+Run 'forego help [command]' for details.
+`[1:]))
 
 func printUsage() {
   usageTemplate.Execute(os.Stdout, struct {
