@@ -7,6 +7,7 @@ import (
   "github.com/daviddengcn/go-colortext"
   "github.com/kr/pretty"
   "io"
+  "os"
   "sync"
 )
 
@@ -80,4 +81,9 @@ func SystemOutput(str string) {
   ct.ResetColor()
   fmt.Println(str)
   ct.ResetColor()
+}
+
+func ErrorOutput(str string) {
+  fmt.Printf("ERROR: %s\n", str)
+  os.Exit(1)
 }

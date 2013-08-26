@@ -17,7 +17,7 @@ type ProcfileEntry struct {
 }
 
 type Procfile struct {
-  entries []ProcfileEntry
+  Entries []ProcfileEntry
 }
 
 var _ = pretty.Println // lol
@@ -31,12 +31,23 @@ func ReadProcfile(filename string) (*Procfile, error) {
   return parseProcfile(fd)
 }
 
+func (pf *Procfile) HasProcess(name string) (exists bool) {
+  exists = false
+  for _, entry := range pf.Entries {
+    if name == entry.Name {
+      exists = true
+      break
+    }
+  }
+  return
+}
+
 func parseProcfile(r io.Reader) (*Procfile, error) {
   pf := new(Procfile)
   scanner := bufio.NewScanner(r)
   for scanner.Scan() {
     parts := procfileEntryRegexp.FindStringSubmatch(scanner.Text())
-    pf.entries = append(pf.entries, ProcfileEntry{parts[1], parts[2]})
+    pf.Entries = append(pf.Entries, ProcfileEntry{parts[1], parts[2]})
   }
   if err := scanner.Err(); err != nil {
     return nil, fmt.Errorf("Reading Procfile: %s", err)
