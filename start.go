@@ -11,7 +11,7 @@ import (
   "time"
 )
 
-const shutdownGraceTime = 1 * time.Second
+const shutdownGraceTime = 3 * time.Second
 
 var _ = pretty.Println // lol
 var _ = os.Stdout
@@ -20,6 +20,7 @@ var flagProcfile string
 var flagEnv string
 var flagPort int
 
+var shutdown_mutex = new(sync.Mutex)
 var wg sync.WaitGroup
 
 var cmdStart = &Command{
@@ -37,6 +38,7 @@ Examples:
 }
 
 var processes = map[string]*exec.Cmd{}
+var shutting_down bool = false
 
 func init() {
   cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
@@ -81,9 +83,12 @@ func runStart(cmd *Command, args []string) {
     }(proc, ps)
   }
   wg.Wait()
+  shutdown_mutex.Unlock()
 }
 
 func ShutdownProcesses() {
+  shutdown_mutex.Lock()
+  SystemOutput("shutting down")
   for name, ps := range processes {
     SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
     group, _ := os.FindProcess(-1 * ps.Process.Pid)

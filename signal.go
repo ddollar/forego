@@ -15,8 +15,8 @@ func init() {
     for sig := range handler {
       switch (sig) {
         case os.Interrupt:
-          fmt.Println("      | ctrl-c detected, shutting down")
-          ShutdownProcesses()
+          fmt.Println("      | ctrl-c detected")
+          go func() { ShutdownProcesses() }()
         }
     }
   }()
