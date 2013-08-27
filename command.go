@@ -15,13 +15,13 @@ type Command struct {
   Flag flag.FlagSet
 
   Usage string // first word is the command name
-  Short string // `hk help` output
-  Long  string // `hk help cmd` output
+  Short string // `forego help` output
+  Long  string // `forego help cmd` output
 }
 
 func (c *Command) printUsage() {
   if c.Runnable() {
-    fmt.Printf("Usage: hk %s\n\n", c.Usage)
+    fmt.Printf("Usage: forego %s\n\n", c.Usage)
   }
   fmt.Println(strings.Trim(c.Long, "\n"))
 }
