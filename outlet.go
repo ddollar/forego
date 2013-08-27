@@ -22,7 +22,7 @@ var _ = bufio.NewScanner
 var _ = bytes.NewReader
 
 var longest int
-var mutex = new(sync.Mutex)
+var mx sync.Mutex
 
 var colors = []ct.Color{
 	ct.Cyan,
@@ -34,8 +34,8 @@ var colors = []ct.Color{
 }
 
 func (o *Outlet) Write(b []byte) (num int, err error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+	mx.Lock()
+	defer mx.Unlock()
 	scanner := bufio.NewScanner(bytes.NewReader(b))
 	for scanner.Scan() {
 		formatter := fmt.Sprintf("%%-%ds | ", longest)
