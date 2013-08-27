@@ -12,4 +12,5 @@ install: forego
 	cp $< ${GOPATH}/bin/
 
 $(BIN): $(SRC)
+	go fmt
 	go build -o $@ $(SRC)
