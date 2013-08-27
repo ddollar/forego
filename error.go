@@ -1,13 +1,13 @@
 package main
 
 import (
-  "fmt"
-  "os"
+	"fmt"
+	"os"
 )
 
 func handleError(err error) {
-  if err != nil {
-    fmt.Println("ERROR:", err)
-    os.Exit(1)
-  }
+	if err != nil {
+		fmt.Println("ERROR:", err)
+		os.Exit(1)
+	}
 }
