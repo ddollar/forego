@@ -38,7 +38,7 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   scanner := bufio.NewScanner(bytes.NewReader(b))
   for scanner.Scan() {
     formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
-    ct.ChangeColor(o.Color, false, ct.None, false)
+    ct.ChangeColor(o.Color, true, ct.None, false)
     fmt.Printf(formatter, o.Name)
     if (o.IsError) {
       ct.ChangeColor(ct.Red, true, ct.None, true)
@@ -75,7 +75,7 @@ func LongestOutletName() (longest int) {
 }
 
 func SystemOutput(str string) {
-  ct.ChangeColor(ct.White, true, ct.None, true)
+  ct.ChangeColor(ct.White, true, ct.None, false)
   formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
   fmt.Printf(formatter, "foreman")
   ct.ResetColor()
