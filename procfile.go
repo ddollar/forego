@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/kr/pretty"
+	_ "github.com/kr/pretty"
 	"io"
 	"os"
 	"regexp"
@@ -20,8 +20,6 @@ type Procfile struct {
 	Entries []ProcfileEntry
 }
 
-var _ = pretty.Println // lol
-
 func ReadProcfile(filename string) (*Procfile, error) {
 	fd, err := os.Open(filename)
 	if err != nil {
@@ -32,14 +30,12 @@ func ReadProcfile(filename string) (*Procfile, error) {
 }
 
 func (pf *Procfile) HasProcess(name string) (exists bool) {
-	exists = false
 	for _, entry := range pf.Entries {
 		if name == entry.Name {
-			exists = true
-			break
+			return true
 		}
 	}
-	return
+	return false
 }
 
 func (pf *Procfile) LongestProcessName() (longest int) {
