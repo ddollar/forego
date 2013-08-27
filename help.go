@@ -38,7 +38,7 @@ func runHelp(cmd *Command, args []string) {
 }
 
 var usageTemplate = template.Must(template.New("usage").Parse(`
-Usage: foreman <command> [<args>]
+Usage: forego <command> [<args>]
 
 Available commands:{{range .Commands}}{{if .Runnable}}{{if .List}}
    {{.Name | printf "%-8s"}}  {{.Short}}{{end}}{{end}}{{end}}

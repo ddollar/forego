@@ -65,7 +65,7 @@ func createOutlet(name string, index int, isError bool) *Outlet {
 
 func LongestOutletName() (longest int) {
   // kr?
-  longest = 7 // foreman is the shortest name
+  longest = 6 // forego is the shortest name
   for name, _ := range outlets {
     if len(name) > longest {
       longest = len(name)
@@ -77,7 +77,7 @@ func LongestOutletName() (longest int) {
 func SystemOutput(str string) {
   ct.ChangeColor(ct.White, true, ct.None, false)
   formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
-  fmt.Printf(formatter, "foreman")
+  fmt.Printf(formatter, "forego")
   ct.ResetColor()
   fmt.Println(str)
   ct.ResetColor()
