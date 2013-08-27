@@ -42,6 +42,16 @@ func (pf *Procfile) HasProcess(name string) (exists bool) {
   return
 }
 
+func (pf *Procfile) LongestProcessName() (longest int) {
+  longest = 6 // length of forego
+  for _, entry := range pf.Entries {
+    if len(entry.Name) > longest {
+      longest = len(entry.Name)
+    }
+  }
+  return
+}
+
 func parseProcfile(r io.Reader) (*Procfile, error) {
   pf := new(Procfile)
   scanner := bufio.NewScanner(r)

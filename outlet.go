@@ -21,6 +21,7 @@ var _ = pretty.Println // lol
 var _ = bufio.NewScanner
 var _ = bytes.NewReader
 
+var longest int
 var mutex = new(sync.Mutex)
 
 var colors = []ct.Color{
@@ -37,7 +38,7 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
   defer mutex.Unlock()
   scanner := bufio.NewScanner(bytes.NewReader(b))
   for scanner.Scan() {
-    formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
+    formatter := fmt.Sprintf("%%-%ds | ", longest)
     ct.ChangeColor(o.Color, true, ct.None, false)
     fmt.Printf(formatter, o.Name)
     if (o.IsError) {
@@ -63,20 +64,13 @@ func createOutlet(name string, index int, isError bool) *Outlet {
   return outlets[name]
 }
 
-func LongestOutletName() (longest int) {
-  // kr?
-  longest = 6 // forego is the shortest name
-  for name, _ := range outlets {
-    if len(name) > longest {
-      longest = len(name)
-    }
-  }
-  return
+func SetLongestOutletName(l int) {
+  longest = l
 }
 
 func SystemOutput(str string) {
   ct.ChangeColor(ct.White, true, ct.None, false)
-  formatter := fmt.Sprintf("%%-%ds | ", LongestOutletName())
+  formatter := fmt.Sprintf("%%-%ds | ", longest)
   fmt.Printf(formatter, "forego")
   ct.ResetColor()
   fmt.Println(str)

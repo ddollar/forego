@@ -74,6 +74,8 @@ func runStart(cmd *Command, args []string) {
   env, err := ReadEnv(flagEnv)
   handleError(err)
 
+  SetLongestOutletName(pf.LongestProcessName())
+
   ps_env := os.Environ()
   for name, val := range env {
     ps_env = append(ps_env, fmt.Sprintf("%s=%s", name, val))
