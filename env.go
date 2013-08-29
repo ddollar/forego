@@ -37,7 +37,10 @@ func parseEnv(r io.Reader) (Env, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		parts := envEntryRegexp.FindStringSubmatch(scanner.Text())
-		env[parts[1]] = parts[2]
+		if len(parts) == 3 {
+			fmt.Printf("parts: %v\n", parts)
+			env[parts[1]] = parts[2]
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("Reading Env: %s", err)
