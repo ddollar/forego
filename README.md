@@ -4,7 +4,7 @@ Foreman in Go.
 
 ### Installation
 
-    $ go install github.com/ddollar/forego
+    $ go get -u github.com/ddollar/forego
 
 ### Usage
 
