@@ -14,7 +14,7 @@ install: forego
 lint: $(SRC)
 	go fmt
 
-dist: forego-linux forego-osx forego-windows
+release: forego-linux forego-osx forego-windows
 
 forego-linux: $(SRC)
 	env GOOS=linux GOARCH=386 go build -o $@
