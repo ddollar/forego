@@ -54,11 +54,11 @@ func (p *Process) Signal(signal syscall.Signal) {
 }
 
 func (p *Process) envAsArray() (env []string) {
-	for name, val := range os.Environ() {
-		env = append(env, fmt.Sprintf("%s=%s", name, val));
+	for _, pair := range os.Environ() {
+		env = append(env, pair)
 	}
 	for name, val := range p.Env {
-		env = append(env, fmt.Sprintf("%s=%s", name, val));
+		env = append(env, fmt.Sprintf("%s=%s", name, val))
 	}
 	return
 }
