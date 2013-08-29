@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/kr/pretty"
 	"io"
 	"os"
 	"regexp"
@@ -17,8 +16,6 @@ type EnvEntry struct {
 }
 
 type Env map[string]string
-
-var _ = pretty.Println // lol
 
 func ReadEnv(filename string) (Env, error) {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
