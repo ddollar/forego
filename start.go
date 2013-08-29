@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -100,20 +99,4 @@ func runStart(cmd *Command, args []string) {
 	}
 
 	wg.Wait()
-}
-
-func ShutdownProcesses(of *OutletFactory) {
-	shutdown_mutex.Lock()
-	of.SystemOutput("shutting down")
-	for name, ps := range processes {
-		of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
-		ps.Signal(syscall.SIGTERM)
-	}
-	go func() {
-		time.Sleep(shutdownGraceTime)
-		for name, ps := range processes {
-			of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
-			ps.Signal(syscall.SIGKILL)
-		}
-	}()
 }
