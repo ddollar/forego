@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/kr/pretty"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -14,12 +13,9 @@ import (
 
 const shutdownGraceTime = 3 * time.Second
 
-var _ = pretty.Println // lol
-var _ = os.Stdout
-
 var flagPort int
 
-var processes = map[string]*exec.Cmd{}
+var processes = map[string]*Process{}
 var shutdown_mutex = new(sync.Mutex)
 var wg sync.WaitGroup
 
@@ -45,6 +41,21 @@ func init() {
 }
 
 func runStart(cmd *Command, args []string) {
+	root := filepath.Dir(flagProcfile)
+
+	if flagEnv == "" {
+		flagEnv = filepath.Join(root, ".env")
+	}
+
+	pf, err := ReadProcfile(flagProcfile)
+	handleError(err)
+
+	env, err := ReadEnv(flagEnv)
+	handleError(err)
+
+	of := NewOutletFactory()
+	of.Padding = pf.LongestProcessName()
+
 	handler := make(chan os.Signal, 1)
 	signal.Notify(handler, os.Interrupt)
 
@@ -53,82 +64,56 @@ func runStart(cmd *Command, args []string) {
 			switch sig {
 			case os.Interrupt:
 				fmt.Println("      | ctrl-c detected")
-				go func() { ShutdownProcesses() }()
+				go func() { ShutdownProcesses(of) }()
 			}
 		}
 	}()
 
-	root := filepath.Dir(flagProcfile)
-
-	if flagEnv == "" {
-		flagEnv = filepath.Join(root, ".env")
-	}
-
 	var singleton string = ""
 	if len(args) > 0 {
 		singleton = args[0]
-	}
-
-	pf, err := ReadProcfile(flagProcfile)
-	handleError(err)
-	env, err := ReadEnv(flagEnv)
-	handleError(err)
-
-	SetLongestOutletName(pf.LongestProcessName())
-
-	ps_env := os.Environ()
-	for name, val := range env {
-		ps_env = append(ps_env, fmt.Sprintf("%s=%s", name, val))
-	}
-
-	if singleton != "" {
 		if !pf.HasProcess(singleton) {
-			ErrorOutput(fmt.Sprintf("no such process: %s", singleton))
+			of.ErrorOutput(fmt.Sprintf("no such process: %s", singleton))
 		}
 	}
 
 	for idx, proc := range pf.Entries {
 		if (singleton == "") || (singleton == proc.Name) {
 			wg.Add(1)
-			command := []string{"/bin/bash", "-c", fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(root, ".profile"), proc.Command)}
-			ps := exec.Command(command[0], command[1:]...)
 			port := flagPort + (idx * 100)
+			ps := NewProcess(proc.Command, env)
 			processes[proc.Name] = ps
-			ps.Dir = root
-			ps.Env = append(ps_env, fmt.Sprintf("PORT=%d", port))
+			ps.Env["PORT"] = strconv.Itoa(flagPort + (idx * 1000))
+			ps.Root = filepath.Dir(flagProcfile)
 			ps.Stdin = nil
-			ps.Stdout = createOutlet(proc.Name, idx, false)
-			ps.Stderr = createOutlet(proc.Name, idx, true)
-			ps.SysProcAttr = &syscall.SysProcAttr{}
-			ps.SysProcAttr.Setsid = true
+			ps.Stdout = of.CreateOutlet(proc.Name, idx, false)
+			ps.Stderr = of.CreateOutlet(proc.Name, idx, true)
 			ps.Start()
-			SystemOutput(fmt.Sprintf("starting %s on port %d", proc.Name, port))
-			go func(proc ProcfileEntry, ps *exec.Cmd) {
+			of.SystemOutput(fmt.Sprintf("starting %s on port %d", proc.Name, port))
+			go func(proc ProcfileEntry, ps *Process) {
 				ps.Wait()
 				wg.Done()
 				delete(processes, proc.Name)
+				ShutdownProcesses(of)
 			}(proc, ps)
 		}
 	}
 
 	wg.Wait()
-	shutdown_mutex.Unlock()
 }
 
-func ShutdownProcesses() {
+func ShutdownProcesses(of *OutletFactory) {
 	shutdown_mutex.Lock()
-	SystemOutput("shutting down")
+	of.SystemOutput("shutting down")
 	for name, ps := range processes {
-		SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
-		group, _ := os.FindProcess(-1 * ps.Process.Pid)
-		group.Signal(syscall.SIGTERM)
+		of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
+		ps.Signal(syscall.SIGTERM)
 	}
 	go func() {
 		time.Sleep(shutdownGraceTime)
 		for name, ps := range processes {
-			SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
-			group, _ := os.FindProcess(-1 * ps.Process.Pid)
-			group.Signal(syscall.SIGKILL)
+			of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
+			ps.Signal(syscall.SIGKILL)
 		}
 	}()
 }

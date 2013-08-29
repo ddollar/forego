@@ -11,6 +11,8 @@ clean:
 install: forego
 	cp $< ${GOPATH}/bin/
 
-$(BIN): $(SRC)
+release: build
 	go fmt
+
+$(BIN): $(SRC)
 	go build -o $@ $(SRC)
