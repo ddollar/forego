@@ -38,7 +38,6 @@ func parseEnv(r io.Reader) (Env, error) {
 	for scanner.Scan() {
 		parts := envEntryRegexp.FindStringSubmatch(scanner.Text())
 		if len(parts) == 3 {
-			fmt.Printf("parts: %v\n", parts)
 			env[parts[1]] = parts[2]
 		}
 	}
