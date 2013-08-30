@@ -1,11 +1,11 @@
 package main
 
 import (
-  "fmt"
-  "os"
-  "os/exec"
-  "path/filepath"
-  "syscall"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
 	"time"
 )
 
