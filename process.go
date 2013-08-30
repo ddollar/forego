@@ -30,7 +30,7 @@ func NewProcess(command string, env Env) (p *Process) {
 }
 
 func (p *Process) Wait() {
-  p.cmd.Wait()
+	p.cmd.Wait()
 }
 
 func (p *Process) envAsArray() (env []string) {

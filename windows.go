@@ -1,10 +1,10 @@
 package main
 
 import (
-  "fmt"
-  "os"
-  "os/exec"
-  "syscall"
+	"fmt"
+	"os"
+	"os/exec"
+	"syscall"
 )
 
 func (p *Process) Start() {
