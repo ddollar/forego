@@ -1,11 +1,8 @@
 package main
 
 import (
-	"github.com/kr/pretty"
 	"os"
 )
-
-var _ = pretty.Println // lol
 
 var commands = []*Command{
 	cmdStart,
