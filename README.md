@@ -6,12 +6,12 @@ Foreman in Go.
 
 ##### Precompiled Binaries
 
-* [forego-darwin-386](http://forego.s3.amazonaws.com/forego-darwin-386)
-* [forego-darwin-amd64](http://forego.s3.amazonaws.com/forego-darwin-amd64)
-* [forego-linux-386](http://forego.s3.amazonaws.com/forego-linux-386)
-* [forego-linux-amd64](http://forego.s3.amazonaws.com/forego-linux-amd64)
-* [forego-windows-386.exe](http://forego.s3.amazonaws.com/forego-windows-386.exe)
-* [forego-windows-amd64.exe](http://forego.s3.amazonaws.com/forego-windows-amd64.exe)
+* [Linux 32bit](https://forego-build.herokuapp.com/linux-386/forego)
+* [Linux 64bit](https://forego-build.herokuapp.com/linux-amd64/forego)
+* [OS X 32bit](https://forego-build.herokuapp.com/darwin-386/forego)
+* [OS X 64bit](https://forego-build.herokuapp.com/darwin-amd64/forego)
+* [Windows 32bit](https://forego-build.herokuapp.com/windows-386/forego.exe)
+* [Windows 64bit](https://forego-build.herokuapp.com/windows-amd64/forego.exe)
 
 ##### Compile from Source
 
