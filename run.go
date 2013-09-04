@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -23,6 +24,11 @@ func init() {
 }
 
 func runRun(cmd *Command, args []string) {
+	if flagEnv == "" {
+		root, _ := os.Getwd()
+		flagEnv = filepath.Join(root, ".env")
+	}
+
 	env, err := ReadEnv(flagEnv)
 	handleError(err)
 
