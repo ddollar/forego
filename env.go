@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"io"
+	"github.com/subosito/gotenv"
 	"os"
 	"regexp"
 )
@@ -26,20 +24,9 @@ func ReadEnv(filename string) (Env, error) {
 		return nil, err
 	}
 	defer fd.Close()
-	return parseEnv(fd)
-}
-
-func parseEnv(r io.Reader) (Env, error) {
 	env := make(Env)
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		parts := envEntryRegexp.FindStringSubmatch(scanner.Text())
-		if len(parts) == 3 {
-			env[parts[1]] = parts[2]
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("Reading Env: %s", err)
+	for key, val := range gotenv.Parse(fd) {
+		env[key] = val
 	}
 	return env, nil
 }
