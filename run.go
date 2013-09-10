@@ -33,7 +33,7 @@ func runRun(cmd *Command, args []string) {
 	handleError(err)
 
 	ps := NewProcess(strings.Join(args, " "), env)
-	ps.Stdin = nil
+	ps.Stdin = os.Stdin
 	ps.Stdout = os.Stdout
 	ps.Stderr = os.Stderr
 	ps.Start()
