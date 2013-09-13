@@ -35,7 +35,7 @@ func (p *Process) Wait() {
 	p.cmd.Wait()
 }
 
-func (p *Process) bashArgument() string {
+func (p *Process) shellArgument() string {
 	if p.Interactive {
 		return "-ic"
 	} else {
