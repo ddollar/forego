@@ -33,6 +33,7 @@ func runRun(cmd *Command, args []string) {
 	handleError(err)
 
 	ps := NewProcess(strings.Join(args, " "), env)
+	ps.Interactive = true
 	ps.Stdin = os.Stdin
 	ps.Stdout = os.Stdout
 	ps.Stderr = os.Stderr
