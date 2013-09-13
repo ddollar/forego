@@ -17,8 +17,10 @@ func (p *Process) Start() {
 	p.cmd.Stdin = p.Stdin
 	p.cmd.Stdout = p.Stdout
 	p.cmd.Stderr = p.Stderr
-	p.cmd.SysProcAttr = &syscall.SysProcAttr{}
-	p.cmd.SysProcAttr.Setsid = true
+	if !p.Interactive {
+		p.cmd.SysProcAttr = &syscall.SysProcAttr{}
+		p.cmd.SysProcAttr.Setsid = true
+	}
 	p.cmd.Start()
 }
 
