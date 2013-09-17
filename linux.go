@@ -10,7 +10,7 @@ import (
 )
 
 func (p *Process) Start() {
-	command := []string{"/bin/bash", p.bashArgument(), fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(p.Root, ".profile"), p.Command)}
+	command := []string{"/bin/bash", p.shellArgument(), fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(p.Root, ".profile"), p.Command)}
 	p.cmd = exec.Command(command[0], command[1:]...)
 	p.cmd.Dir = p.Root
 	p.cmd.Env = p.envAsArray()
