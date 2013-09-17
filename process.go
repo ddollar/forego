@@ -31,6 +31,14 @@ func NewProcess(command string, env Env) (p *Process) {
 	return
 }
 
+func (p *Process) Running() bool {
+	return (p.cmd.Process != nil)
+}
+
+func (p *Process) Pid() int {
+	return p.cmd.Process.Pid
+}
+
 func (p *Process) Wait() {
 	p.cmd.Wait()
 }

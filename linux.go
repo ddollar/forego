@@ -25,8 +25,10 @@ func (p *Process) Start() {
 }
 
 func (p *Process) Signal(signal syscall.Signal) {
-	group, _ := os.FindProcess(-1 * p.cmd.Process.Pid)
-	group.Signal(signal)
+	if p.Running() {
+		group, _ := os.FindProcess(-1 * p.Pid())
+		group.Signal(signal)
+	}
 }
 
 func ShutdownProcesses(of *OutletFactory) {

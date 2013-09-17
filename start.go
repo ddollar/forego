@@ -78,6 +78,7 @@ func runStart(cmd *Command, args []string) {
 
 	for idx, proc := range pf.Entries {
 		if (singleton == "") || (singleton == proc.Name) {
+			shutdown_mutex.Lock()
 			wg.Add(1)
 			port := flagPort + (idx * 100)
 			ps := NewProcess(proc.Command, env)
@@ -95,6 +96,7 @@ func runStart(cmd *Command, args []string) {
 				delete(processes, proc.Name)
 				ShutdownProcesses(of)
 			}(proc, ps)
+			shutdown_mutex.Unlock()
 		}
 	}
 
