@@ -8,11 +8,6 @@ import (
 
 var envEntryRegexp = regexp.MustCompile("^([A-Za-z_0-9]+)=(.*)$")
 
-type EnvEntry struct {
-	name    string
-	command string
-}
-
 type Env map[string]string
 
 func ReadEnv(filename string) (Env, error) {
