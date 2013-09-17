@@ -53,7 +53,9 @@ func parseProcfile(r io.Reader) (*Procfile, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		parts := procfileEntryRegexp.FindStringSubmatch(scanner.Text())
-		pf.Entries = append(pf.Entries, ProcfileEntry{parts[1], parts[2]})
+		if len(parts) > 0 {
+			pf.Entries = append(pf.Entries, ProcfileEntry{parts[1], parts[2]})
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("Reading Procfile: %s", err)
