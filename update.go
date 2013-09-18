@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bitbucket.org/kardianos/osext"
 	"fmt"
 	"github.com/ddollar/dist"
 )
@@ -24,8 +23,7 @@ func init() {
 }
 
 func runUpdate(cmd *Command, args []string) {
-	binary, _ := osext.Executable()
-	d := dist.NewDist(binary, "https://godist.herokuapp.com", "ddollar/forego")
+	d := dist.NewDist("https://godist.herokuapp.com", "ddollar/forego")
 	if len(args) > 0 {
 		err := d.UpdateTo(args[0])
 		if err != nil {
