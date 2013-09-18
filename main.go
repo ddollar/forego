@@ -7,6 +7,7 @@ import (
 var commands = []*Command{
 	cmdStart,
 	cmdRun,
+	cmdUpdate,
 	cmdHelp,
 }
 
