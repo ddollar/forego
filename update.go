@@ -23,7 +23,7 @@ func init() {
 }
 
 func runUpdate(cmd *Command, args []string) {
-	d := dist.NewDist("https://godist.herokuapp.com", "ddollar/forego")
+	d := dist.NewDist("http://godist.herokuapp.com", "ddollar/forego")
 	if len(args) > 0 {
 		err := d.UpdateTo(args[0])
 		if err != nil {
