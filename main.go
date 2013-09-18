@@ -8,6 +8,7 @@ var commands = []*Command{
 	cmdStart,
 	cmdRun,
 	cmdUpdate,
+	cmdVersion,
 	cmdHelp,
 }
 
