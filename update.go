@@ -28,19 +28,17 @@ func runUpdate(cmd *Command, args []string) {
 		return
 	}
 	d := dist.NewDist("ddollar/forego")
+	var err error
+	var to string
 	if len(args) > 0 {
-		err := d.UpdateTo(Version, args[0])
-		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-		} else {
-			fmt.Printf("updated to %s\n", args[0])
-		}
+		err = d.UpdateTo(Version, args[0])
+		to = args[0]
 	} else {
-		version, err := d.Update(Version)
-		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
-		} else {
-			fmt.Printf("updated to %s\n", version)
-		}
+		to, err = d.Update(Version)
+	}
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err)
+	} else {
+		fmt.Printf("updated to %s\n", to)
 	}
 }
