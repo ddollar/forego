@@ -15,7 +15,7 @@ Update forego
 Examples:
 
 	forego update
-	forego update 0.7.6
+	forego update 0.7.8
 `,
 }
 
