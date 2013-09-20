@@ -23,16 +23,20 @@ func init() {
 }
 
 func runUpdate(cmd *Command, args []string) {
+	if (Version == "dev") {
+		fmt.Println("ERROR: can't update dev version")
+		return
+	}
 	d := dist.NewDist("ddollar/forego")
 	if len(args) > 0 {
-		err := d.UpdateTo(args[0])
+		err := d.UpdateTo(Version, args[0])
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 		} else {
 			fmt.Printf("updated to %s\n", args[0])
 		}
 	} else {
-		version, err := d.Update()
+		version, err := d.Update(Version)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 		} else {
