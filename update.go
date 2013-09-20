@@ -23,7 +23,7 @@ func init() {
 }
 
 func runUpdate(cmd *Command, args []string) {
-	if (Version == "dev") {
+	if Version == "dev" {
 		fmt.Println("ERROR: can't update dev version")
 		return
 	}
