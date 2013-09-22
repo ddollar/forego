@@ -13,7 +13,7 @@
 		},
 		{
 			"ImportPath": "github.com/ddollar/dist",
-			"Rev": "76def9a8e494870ec6dbc66c5d3f0cfc4248109b"
+			"Rev": "95b3220dbc9bb70c4cbda93b4064655a1ff86a06"
 		},
 		{
 			"ImportPath": "github.com/inconshreveable/go-execpath",

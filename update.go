@@ -27,14 +27,14 @@ func runUpdate(cmd *Command, args []string) {
 		fmt.Println("ERROR: can't update dev version")
 		return
 	}
-	d := dist.NewDist("ddollar/forego")
+	d := dist.NewDist("ddollar/forego", Version)
 	var err error
 	var to string
 	if len(args) > 0 {
-		err = d.UpdateTo(Version, args[0])
+		err = d.UpdateTo(args[0])
 		to = args[0]
 	} else {
-		to, err = d.Update(Version)
+		to, err = d.Update()
 	}
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err)
