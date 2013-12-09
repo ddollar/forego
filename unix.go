@@ -1,5 +1,7 @@
 package main
 
+// +build darwin freebsd linux netbsd openbsd
+
 import (
 	"fmt"
 	"os"

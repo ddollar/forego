@@ -1,5 +1,7 @@
 package main
 
+// +build windows
+
 import (
 	"fmt"
 	"os"
