@@ -13,6 +13,7 @@ import (
 const shutdownGraceTime = 3 * time.Second
 
 var flagPort int
+var flagNoColor bool
 
 var processes = map[string]*Process{}
 var shutdown_mutex = new(sync.Mutex)
@@ -20,7 +21,7 @@ var wg sync.WaitGroup
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port]",
+	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-n]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
@@ -37,6 +38,7 @@ func init() {
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
 	cmdStart.Flag.StringVar(&flagEnv, "e", "", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")
+	cmdStart.Flag.BoolVar(&flagNoColor, "n", false, "no color in output")
 }
 
 func runStart(cmd *Command, args []string) {
@@ -63,7 +65,7 @@ func runStart(cmd *Command, args []string) {
 			switch sig {
 			case os.Interrupt:
 				fmt.Println("      | ctrl-c detected")
-				go func() { ShutdownProcesses(of) }()
+				go func() { ShutdownProcesses(of, flagNoColor) }()
 			}
 		}
 	}()
@@ -86,15 +88,15 @@ func runStart(cmd *Command, args []string) {
 			ps.Env["PORT"] = strconv.Itoa(flagPort + (idx * 1000))
 			ps.Root = filepath.Dir(flagProcfile)
 			ps.Stdin = nil
-			ps.Stdout = of.CreateOutlet(proc.Name, idx, false)
-			ps.Stderr = of.CreateOutlet(proc.Name, idx, true)
+			ps.Stdout = of.CreateOutlet(proc.Name, idx, false, flagNoColor)
+			ps.Stderr = of.CreateOutlet(proc.Name, idx, true, flagNoColor)
 			ps.Start()
-			of.SystemOutput(fmt.Sprintf("starting %s on port %d", proc.Name, port))
+			of.SystemOutput(fmt.Sprintf("starting %s on port %d", proc.Name, port), flagNoColor)
 			go func(proc ProcfileEntry, ps *Process) {
 				ps.Wait()
 				wg.Done()
 				delete(processes, proc.Name)
-				ShutdownProcesses(of)
+				ShutdownProcesses(of, flagNoColor)
 			}(proc, ps)
 			shutdown_mutex.Unlock()
 		}
