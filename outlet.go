@@ -20,6 +20,7 @@ type Outlet struct {
 	Color   ct.Color
 	IsError bool
 	Factory *OutletFactory
+	NoColor bool
 }
 
 var mx sync.Mutex
@@ -45,9 +46,11 @@ func (o *Outlet) Write(b []byte) (num int, err error) {
 	scanner := bufio.NewScanner(bytes.NewReader(b))
 	for scanner.Scan() {
 		formatter := fmt.Sprintf("%%-%ds | ", o.Factory.Padding)
-		ct.ChangeColor(o.Color, true, ct.None, false)
+		if !o.NoColor {
+			ct.ChangeColor(o.Color, true, ct.None, false)
+		}
 		fmt.Printf(formatter, o.Name)
-		if o.IsError {
+		if o.IsError && !o.NoColor {
 			ct.ChangeColor(ct.Red, true, ct.None, true)
 		} else {
 			ct.ResetColor()
@@ -63,13 +66,15 @@ func ProcessOutput(w io.Writer, str string) {
 	w.Write([]byte(str))
 }
 
-func (of *OutletFactory) CreateOutlet(name string, index int, isError bool) *Outlet {
-	of.Outlets[name] = &Outlet{name, colors[index%len(colors)], isError, of}
+func (of *OutletFactory) CreateOutlet(name string, index int, isError bool, noColor bool) *Outlet {
+	of.Outlets[name] = &Outlet{name, colors[index%len(colors)], isError, of, noColor}
 	return of.Outlets[name]
 }
 
-func (of *OutletFactory) SystemOutput(str string) {
-	ct.ChangeColor(ct.White, true, ct.None, false)
+func (of *OutletFactory) SystemOutput(str string, noColor bool) {
+	if !noColor {
+		ct.ChangeColor(ct.White, true, ct.None, false)
+	}
 	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
 	fmt.Printf(formatter, "forego")
 	ct.ResetColor()

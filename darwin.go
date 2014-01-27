@@ -31,17 +31,17 @@ func (p *Process) Signal(signal syscall.Signal) {
 	}
 }
 
-func ShutdownProcesses(of *OutletFactory) {
+func ShutdownProcesses(of *OutletFactory, noColor bool) {
 	shutdown_mutex.Lock()
-	of.SystemOutput("shutting down")
+	of.SystemOutput("shutting down", noColor)
 	for name, ps := range processes {
-		of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
+		of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name), noColor)
 		ps.Signal(syscall.SIGTERM)
 	}
 	go func() {
 		time.Sleep(shutdownGraceTime)
 		for name, ps := range processes {
-			of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
+			of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name), noColor)
 			ps.Signal(syscall.SIGKILL)
 		}
 	}()
