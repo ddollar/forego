@@ -15,4 +15,4 @@ lint: $(SRC)
 	go fmt
 
 $(BIN): $(SRC)
-	go build -o $@
+	godep go build -o $@
