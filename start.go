@@ -83,7 +83,7 @@ func runStart(cmd *Command, args []string) {
 			port := flagPort + (idx * 100)
 			ps := NewProcess(proc.Command, env)
 			processes[proc.Name] = ps
-			ps.Env["PORT"] = strconv.Itoa(flagPort + (idx * 1000))
+			ps.Env["PORT"] = strconv.Itoa(port)
 			ps.Root = filepath.Dir(flagProcfile)
 			ps.Stdin = nil
 			ps.Stdout = of.CreateOutlet(proc.Name, idx, false)
