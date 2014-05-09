@@ -16,6 +16,8 @@ const shutdownGraceTime = 3 * time.Second
 
 var flagPort int
 var flagConcurrency string
+var flagRestart bool
+var shutdownNow bool
 
 var processes = map[string]*Process{}
 var shutdown_mutex = new(sync.Mutex)
@@ -23,7 +25,7 @@ var wg sync.WaitGroup
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port]",
+	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-r]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
@@ -41,6 +43,7 @@ func init() {
 	cmdStart.Flag.StringVar(&flagEnv, "e", "", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
+	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
 }
 
 func parseConcurrency(value string) (map[string]int, error) {
@@ -71,6 +74,40 @@ func parseConcurrency(value string) (map[string]int, error) {
 	return concurrency, nil
 }
 
+func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
+	shutdown_mutex.Lock()
+	wg.Add(1)
+	port := flagPort + (idx * 100)
+	ps := NewProcess(proc.Command, env)
+	procName := strings.Join([]string{
+		proc.Name,
+		strconv.FormatInt(int64(procNum+1), 10)}, ".")
+	processes[procName] = ps
+	ps.Env["PORT"] = strconv.Itoa(port)
+	ps.Root = filepath.Dir(flagProcfile)
+	ps.Stdin = nil
+	ps.Stdout = of.CreateOutlet(procName, idx, false)
+	ps.Stderr = of.CreateOutlet(procName, idx, true)
+	ps.Start()
+	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
+	go func(proc ProcfileEntry, ps *Process) {
+		ps.Wait()
+
+		if flagRestart && !shutdownNow {
+			delete(processes, proc.Name)
+			startProcess(idx, procNum, proc, env, of)
+			wg.Done()
+			return
+		}
+
+		wg.Done()
+		delete(processes, proc.Name)
+		ShutdownProcesses(of)
+
+	}(proc, ps)
+	shutdown_mutex.Unlock()
+}
+
 func runStart(cmd *Command, args []string) {
 	root := filepath.Dir(flagProcfile)
 
@@ -97,6 +134,7 @@ func runStart(cmd *Command, args []string) {
 		for sig := range handler {
 			switch sig {
 			case os.Interrupt:
+				shutdownNow = true
 				fmt.Println("      | ctrl-c detected")
 				go func() { ShutdownProcesses(of) }()
 			}
@@ -118,28 +156,7 @@ func runStart(cmd *Command, args []string) {
 		}
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
-				shutdown_mutex.Lock()
-				wg.Add(1)
-				port := flagPort + (idx * 100)
-				ps := NewProcess(proc.Command, env)
-				procName := strings.Join([]string{
-					proc.Name,
-					strconv.FormatInt(int64(i+1), 10)}, ".")
-				processes[procName] = ps
-				ps.Env["PORT"] = strconv.Itoa(port)
-				ps.Root = filepath.Dir(flagProcfile)
-				ps.Stdin = nil
-				ps.Stdout = of.CreateOutlet(procName, idx, false)
-				ps.Stderr = of.CreateOutlet(procName, idx, true)
-				ps.Start()
-				of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
-				go func(proc ProcfileEntry, ps *Process) {
-					ps.Wait()
-					wg.Done()
-					delete(processes, procName)
-					ShutdownProcesses(of)
-				}(proc, ps)
-				shutdown_mutex.Unlock()
+				startProcess(idx, i, proc, env, of)
 			}
 		}
 	}
