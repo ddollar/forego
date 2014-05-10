@@ -8,7 +8,7 @@ import (
 
 var cmdRun = &Command{
 	Run:   runRun,
-	Usage: "run [-e env] [-c concurrency] [-p port]",
+	Usage: "run [-e env] [-p port]",
 	Short: "Run a one-off command",
 	Long: `
 Run a one-off command
