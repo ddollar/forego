@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"github.com/daviddengcn/go-colortext"
 	"io"
@@ -14,13 +13,6 @@ type OutletFactory struct {
 	Padding int
 
 	sync.Mutex
-}
-
-type Outlet struct {
-	Name    string
-	Color   ct.Color
-	IsError bool
-	Factory *OutletFactory
 }
 
 var colors = []ct.Color{
@@ -36,27 +28,14 @@ func NewOutletFactory() (of *OutletFactory) {
 	return new(OutletFactory)
 }
 
-func (o *Outlet) Write(b []byte) (num int, err error) {
-	scanner := bufio.NewScanner(bytes.NewReader(b))
-	for scanner.Scan() {
-		o.Factory.WriteLine(o.Name, scanner.Text(), ct.White, ct.None, o.IsError)
-	}
-	num = len(b)
-	return
-}
-
-func ProcessOutput(w io.Writer, str string) {
-	w.Write([]byte(str))
-}
-
 func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, r io.Reader, isError bool) {
 	defer wg.Done()
 
-	o := &Outlet{name, colors[index%len(colors)], isError, of}
+	color := colors[index%len(colors)]
 
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		of.WriteLine(o.Name, scanner.Text(), o.Color, ct.None, o.IsError)
+		of.WriteLine(name, scanner.Text(), color, ct.None, isError)
 	}
 }
 
