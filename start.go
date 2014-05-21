@@ -76,7 +76,6 @@ func parseConcurrency(value string) (map[string]int, error) {
 
 func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
 	shutdown_mutex.Lock()
-	wg.Add(1)
 	port := flagPort + (idx * 100)
 	ps := NewProcess(proc.Command, env)
 	procName := fmt.Sprint(proc.Name, ".", procNum+1)
@@ -89,17 +88,18 @@ func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFacto
 	ps.Start()
 
 	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
+
+	wg.Add(1)
 	go func(proc ProcfileEntry, ps *Process) {
+		defer wg.Done()
 		ps.Wait()
 
 		if flagRestart && !shutdownNow {
 			delete(processes, proc.Name)
 			startProcess(idx, procNum, proc, env, of)
-			wg.Done()
 			return
 		}
 
-		wg.Done()
 		delete(processes, proc.Name)
 		ShutdownProcesses(of)
 
