@@ -11,8 +11,12 @@ import (
 
 const osHaveSigTerm = false
 
+func ShellInvocationCommand(interactive bool, root, command string) []string {
+	return []string{"cmd", "/C", command}
+}
+
 func (p *Process) Start() {
-	command := []string{"cmd", "/C", p.Command}
+	command := ShellInvocationCommand(p.Root, p.Command)
 	p.cmd = exec.Command(command[0], command[1:]...)
 	p.cmd.Dir = p.Root
 	p.cmd.Env = p.Env.asArray()

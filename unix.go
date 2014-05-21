@@ -11,8 +11,19 @@ import (
 
 const osHaveSigTerm = true
 
+func ShellInvocationCommand(interactive bool, root, command string) []string {
+	shellArgument := "-c"
+	if interactive {
+		shellArgument = "-ic"
+	}
+	profile := filepath.Join(root, ".profile")
+	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; %s", profile, command)
+	return []string{"/bin/bash", shellArgument, shellCommand}
+
+}
+
 func (p *Process) Start() {
-	command := []string{"/bin/bash", p.shellArgument(), fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(p.Root, ".profile"), p.Command)}
+	command := ShellInvocationCommand(p.Interactive, p.Root, p.Command)
 	p.cmd = exec.Command(command[0], command[1:]...)
 	p.cmd.Dir = p.Root
 	p.cmd.Env = p.Env.asArray()
