@@ -179,3 +179,9 @@ func runStart(cmd *Command, args []string) {
 
 	f.wg.Wait()
 }
+
+func ShutdownProcesses(of *OutletFactory) {
+	for name, p := range processes {
+		ShutdownProcess(of, p, name)
+	}
+}

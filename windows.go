@@ -25,10 +25,7 @@ func (p *Process) Signal(signal syscall.Signal) {
 	group.Signal(signal)
 }
 
-func ShutdownProcesses(of *OutletFactory) {
-	for name, ps := range processes {
-		of.SystemOutput(fmt.Sprintf("terminating %s", name))
-		ps.cmd.Process.Signal(os.Kill)
-	}
-	os.Exit(1)
+func ShutdownProcess(of *OutletFactory, ps *Process, name string) {
+	of.SystemOutput(fmt.Sprintf("terminating %s", name))
+	ps.cmd.Process.Signal(os.Kill)
 }

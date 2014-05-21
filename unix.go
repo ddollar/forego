@@ -33,16 +33,12 @@ func (p *Process) Signal(signal syscall.Signal) {
 	}
 }
 
-func ShutdownProcesses(of *OutletFactory) {
-	for name, ps := range processes {
-		of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
-		ps.Signal(syscall.SIGTERM)
-	}
+func ShutdownProcess(of *OutletFactory, ps *Process, name string) {
+	of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
+	ps.Signal(syscall.SIGTERM)
 	go func() {
 		time.Sleep(shutdownGraceTime)
-		for name, ps := range processes {
-			of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
-			ps.Signal(syscall.SIGKILL)
-		}
+		of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
+		ps.Signal(syscall.SIGKILL)
 	}()
 }
