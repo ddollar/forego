@@ -13,6 +13,8 @@ import (
 type OutletFactory struct {
 	Outlets map[string]*Outlet
 	Padding int
+
+	sync.Mutex
 }
 
 type Outlet struct {
@@ -21,8 +23,6 @@ type Outlet struct {
 	IsError bool
 	Factory *OutletFactory
 }
-
-var mx sync.Mutex
 
 var colors = []ct.Color{
 	ct.Cyan,
@@ -40,20 +40,9 @@ func NewOutletFactory() (of *OutletFactory) {
 }
 
 func (o *Outlet) Write(b []byte) (num int, err error) {
-	mx.Lock()
-	defer mx.Unlock()
 	scanner := bufio.NewScanner(bytes.NewReader(b))
 	for scanner.Scan() {
-		formatter := fmt.Sprintf("%%-%ds | ", o.Factory.Padding)
-		ct.ChangeColor(o.Color, true, ct.None, false)
-		fmt.Printf(formatter, o.Name)
-		if o.IsError {
-			ct.ChangeColor(ct.Red, true, ct.None, true)
-		} else {
-			ct.ResetColor()
-		}
-		fmt.Println(scanner.Text())
-		ct.ResetColor()
+		o.Factory.WriteLine(o.Name, scanner.Text(), ct.White, ct.None, o.IsError)
 	}
 	num = len(b)
 	return
@@ -69,15 +58,27 @@ func (of *OutletFactory) CreateOutlet(name string, index int, isError bool) *Out
 }
 
 func (of *OutletFactory) SystemOutput(str string) {
-	ct.ChangeColor(ct.White, true, ct.None, false)
-	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
-	fmt.Printf(formatter, "forego")
-	ct.ResetColor()
-	fmt.Println(str)
-	ct.ResetColor()
+	of.WriteLine("forego", str, ct.White, ct.None, false)
 }
 
 func (of *OutletFactory) ErrorOutput(str string) {
 	fmt.Printf("ERROR: %s\n", str)
 	os.Exit(1)
+}
+
+// Write out a single coloured line
+func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, isError bool) {
+	of.Lock()
+	defer of.Unlock()
+
+	ct.ChangeColor(leftC, true, ct.None, false)
+	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
+	fmt.Printf(formatter, left)
+
+	if isError {
+		ct.ChangeColor(ct.Red, true, ct.None, true)
+	} else {
+		ct.ResetColor()
+	}
+	fmt.Println(right)
 }
