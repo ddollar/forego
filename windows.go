@@ -20,17 +20,6 @@ func (p *Process) PlatformSpecificInit() {
 	return
 }
 
-func (p *Process) Start() {
-	command := ShellInvocationCommand(p.Root, p.Command)
-	p.cmd = exec.Command(command[0], command[1:]...)
-	p.cmd.Dir = p.Root
-	p.cmd.Env = p.Env.asArray()
-	p.cmd.Stdin = p.Stdin
-	p.cmd.Stdout = p.Stdout
-	p.cmd.Stderr = p.Stderr
-	p.cmd.Start()
-}
-
 func (p *Process) SendSigTerm() {
 	panic("SendSigTerm() not implemented on this platform")
 }

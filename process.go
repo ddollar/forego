@@ -31,6 +31,18 @@ func NewProcess(command string, env Env) (p *Process) {
 	return
 }
 
+func (p *Process) Start() {
+	command := ShellInvocationCommand(p.Interactive, p.Root, p.Command)
+	p.cmd = exec.Command(command[0], command[1:]...)
+	p.cmd.Dir = p.Root
+	p.cmd.Env = p.Env.asArray()
+	p.cmd.Stdin = p.Stdin
+	p.cmd.Stdout = p.Stdout
+	p.cmd.Stderr = p.Stderr
+	p.PlatformSpecificInit()
+	p.cmd.Start()
+}
+
 func (p *Process) Signal(signal syscall.Signal) {
 	group, _ := os.FindProcess(-1 * p.Pid())
 	group.Signal(signal)
