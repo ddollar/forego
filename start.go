@@ -20,8 +20,6 @@ var flagRestart bool
 var shutdownNow bool
 
 var processes = map[string]*Process{}
-var shutdown_mutex = new(sync.Mutex)
-var wg sync.WaitGroup
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -74,10 +72,13 @@ func parseConcurrency(value string) (map[string]int, error) {
 	return concurrency, nil
 }
 
-func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
-	shutdown_mutex.Lock()
-	defer shutdown_mutex.Unlock()
+type Forego struct {
+	shutdown sync.Once
+	teardown chan struct{} // barrier: closed when shutting down
+	wg       sync.WaitGroup
+}
 
+func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
 	port := flagPort + (idx * 100)
 
 	ps := NewProcess(proc.Command, env)
@@ -92,20 +93,39 @@ func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFacto
 
 	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
 
-	wg.Add(1)
+	f.wg.Add(1)
 	go func(proc ProcfileEntry, ps *Process) {
-		defer wg.Done()
+		defer f.wg.Done()
+
 		ps.Wait()
 
 		if flagRestart && !shutdownNow {
 			delete(processes, proc.Name)
-			startProcess(idx, procNum, proc, env, of)
+			f.startProcess(idx, procNum, proc, env, of)
 			return
 		}
 
 		delete(processes, proc.Name)
-		ShutdownProcesses(of)
+		f.SignalShutdown()
 	}(proc, ps)
+}
+
+func (f *Forego) SignalShutdown() {
+	f.shutdown.Do(func() {
+		close(f.teardown)
+	})
+}
+
+func (f *Forego) monitorInterrupt() {
+	handler := make(chan os.Signal, 1)
+	signal.Notify(handler, os.Interrupt)
+	for sig := range handler {
+		switch sig {
+		case os.Interrupt:
+			fmt.Println("      | ctrl-c detected")
+			f.SignalShutdown()
+		}
+	}
 }
 
 func runStart(cmd *Command, args []string) {
@@ -127,19 +147,11 @@ func runStart(cmd *Command, args []string) {
 	of := NewOutletFactory()
 	of.Padding = pf.LongestProcessName()
 
-	handler := make(chan os.Signal, 1)
-	signal.Notify(handler, os.Interrupt)
+	f := &Forego{
+		teardown: make(chan struct{}),
+	}
 
-	go func() {
-		for sig := range handler {
-			switch sig {
-			case os.Interrupt:
-				shutdownNow = true
-				fmt.Println("      | ctrl-c detected")
-				go func() { ShutdownProcesses(of) }()
-			}
-		}
-	}()
+	go f.monitorInterrupt()
 
 	var singleton string = ""
 	if len(args) > 0 {
@@ -156,10 +168,14 @@ func runStart(cmd *Command, args []string) {
 		}
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
-				startProcess(idx, i, proc, env, of)
+				f.startProcess(idx, i, proc, env, of)
 			}
 		}
 	}
 
-	wg.Wait()
+	<-f.teardown
+	of.SystemOutput("shutting down")
+	ShutdownProcesses(of)
+
+	f.wg.Wait()
 }
