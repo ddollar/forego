@@ -70,15 +70,19 @@ func parseConcurrency(value string) (map[string]int, error) {
 }
 
 type Forego struct {
-	shutdown    sync.Once     // Closes teardown exactly once
-	teardown    chan struct{} // barrier: closed when shutting down
-	teardownNow chan struct{} // barrier: second CTRL-C. More urgent.
+	outletFactory *OutletFactory
+	shutdown      sync.Once     // Closes teardown exactly once
+	teardown      chan struct{} // barrier: closed when shutting down
+	teardownNow   chan struct{} // barrier: second CTRL-C. More urgent.
 
 	wg sync.WaitGroup
 }
 
 func (f *Forego) SignalShutdown() {
-	f.shutdown.Do(func() { close(f.teardown) })
+	f.shutdown.Do(func() {
+		f.outletFactory.SystemOutput("shutting down")
+		close(f.teardown)
+	})
 }
 
 func (f *Forego) monitorInterrupt() {
@@ -185,6 +189,8 @@ func runStart(cmd *Command, args []string) {
 	of.Padding = pf.LongestProcessName()
 
 	f := &Forego{
+		outletFactory: of,
+
 		teardown:    make(chan struct{}),
 		teardownNow: make(chan struct{}),
 	}
@@ -212,7 +218,6 @@ func runStart(cmd *Command, args []string) {
 	}
 
 	<-f.teardown
-	of.SystemOutput("shutting down")
 
 	f.wg.Wait()
 }
