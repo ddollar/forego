@@ -11,7 +11,6 @@ import (
 )
 
 type OutletFactory struct {
-	Outlets map[string]*Outlet
 	Padding int
 
 	sync.Mutex
@@ -34,9 +33,7 @@ var colors = []ct.Color{
 }
 
 func NewOutletFactory() (of *OutletFactory) {
-	of = new(OutletFactory)
-	of.Outlets = make(map[string]*Outlet)
-	return
+	return new(OutletFactory)
 }
 
 func (o *Outlet) Write(b []byte) (num int, err error) {
@@ -52,9 +49,15 @@ func ProcessOutput(w io.Writer, str string) {
 	w.Write([]byte(str))
 }
 
-func (of *OutletFactory) CreateOutlet(name string, index int, isError bool) *Outlet {
-	of.Outlets[name] = &Outlet{name, colors[index%len(colors)], isError, of}
-	return of.Outlets[name]
+func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, r io.Reader, isError bool) {
+	defer wg.Done()
+
+	o := &Outlet{name, colors[index%len(colors)], isError, of}
+
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		of.WriteLine(o.Name, scanner.Text(), o.Color, ct.None, o.IsError)
+	}
 }
 
 func (of *OutletFactory) SystemOutput(str string) {
@@ -81,4 +84,7 @@ func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, i
 		ct.ResetColor()
 	}
 	fmt.Println(right)
+	if isError {
+		ct.ResetColor()
+	}
 }

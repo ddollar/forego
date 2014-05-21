@@ -71,9 +71,10 @@ func parseConcurrency(value string) (map[string]int, error) {
 
 type Forego struct {
 	outletFactory *OutletFactory
-	shutdown      sync.Once     // Closes teardown exactly once
-	teardown      chan struct{} // barrier: closed when shutting down
-	teardownNow   chan struct{} // barrier: second CTRL-C. More urgent.
+
+	shutdown    sync.Once     // Closes teardown exactly once
+	teardown    chan struct{} // barrier: closed when shutting down
+	teardownNow chan struct{} // barrier: second CTRL-C. More urgent.
 
 	wg sync.WaitGroup
 }
@@ -114,17 +115,34 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 	ps := NewProcess(workDir, proc.Command, env, interactive)
 	procName := fmt.Sprint(proc.Name, ".", procNum+1)
 	ps.Env["PORT"] = strconv.Itoa(port)
+
 	ps.Stdin = nil
-	ps.Stdout = of.CreateOutlet(procName, idx, false)
-	ps.Stderr = of.CreateOutlet(procName, idx, true)
+
+	stdout, err := ps.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	stderr, err := ps.StderrPipe()
+	if err != nil {
+		panic(err)
+	}
+
+	pipeWait := new(sync.WaitGroup)
+	pipeWait.Add(2)
+	go of.LineReader(pipeWait, procName, idx, stdout, false)
+	go of.LineReader(pipeWait, procName, idx, stderr, true)
 
 	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
 
 	finished := make(chan struct{}) // closed on process exit
 
 	ps.Start()
+
+	f.wg.Add(1)
 	go func() {
+		defer f.wg.Done()
 		defer close(finished)
+		pipeWait.Wait()
 		ps.Wait()
 	}()
 
@@ -134,14 +152,13 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 		// Prevent goroutine from exiting before process has finished.
 		defer func() { <-finished }()
+		defer f.SignalShutdown()
 
 		select {
 		case <-finished:
 			if flagRestart {
 				f.startProcess(idx, procNum, proc, env, of)
 				return
-			} else {
-				f.SignalShutdown()
 			}
 
 		case <-f.teardown:
