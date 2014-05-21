@@ -125,7 +125,7 @@ func runStart(cmd *Command, args []string) {
 	handleError(err)
 
 	of := NewOutletFactory()
-	of.Padding = pf.LongestProcessName()
+	of.Padding = pf.LongestProcessName(concurrency)
 
 	handler := make(chan os.Signal, 1)
 	signal.Notify(handler, os.Interrupt)

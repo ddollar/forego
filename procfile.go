@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/kr/pretty"
 	"io"
+	"math"
 	"os"
 	"regexp"
 )
@@ -38,11 +39,18 @@ func (pf *Procfile) HasProcess(name string) (exists bool) {
 	return false
 }
 
-func (pf *Procfile) LongestProcessName() (longest int) {
+func (pf *Procfile) LongestProcessName(concurrency map[string]int) (longest int) {
 	longest = 6 // length of forego
 	for _, entry := range pf.Entries {
-		if len(entry.Name) > longest {
-			longest = len(entry.Name)
+		thisLen := len(entry.Name)
+		// The "."
+		thisLen += 1
+		if c, ok := concurrency[entry.Name]; ok {
+			// Add the number of digits
+			thisLen += int(math.Log10(float64(c))) + 1
+		}
+		if thisLen > longest {
+			longest = thisLen
 		}
 	}
 	return
