@@ -27,7 +27,6 @@ func NewProcess(command string, env Env) (p *Process) {
 	p.Stdin = os.Stdin
 	p.Stdout = os.Stdout
 	p.Stderr = os.Stderr
-	p.Root, _ = os.Getwd()
 	return
 }
 
