@@ -22,6 +22,14 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 
 }
 
+func (p *Process) PlatformSpecificInit() {
+	if !p.Interactive {
+		p.cmd.SysProcAttr = &syscall.SysProcAttr{}
+		p.cmd.SysProcAttr.Setsid = true
+	}
+	return
+}
+
 func (p *Process) Start() {
 	command := ShellInvocationCommand(p.Interactive, p.Root, p.Command)
 	p.cmd = exec.Command(command[0], command[1:]...)
@@ -30,10 +38,7 @@ func (p *Process) Start() {
 	p.cmd.Stdin = p.Stdin
 	p.cmd.Stdout = p.Stdout
 	p.cmd.Stderr = p.Stderr
-	if !p.Interactive {
-		p.cmd.SysProcAttr = &syscall.SysProcAttr{}
-		p.cmd.SysProcAttr.Setsid = true
-	}
+	p.PlatformSpecificInit()
 	p.cmd.Start()
 }
 

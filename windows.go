@@ -15,6 +15,11 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 	return []string{"cmd", "/C", command}
 }
 
+func (p *Process) PlatformSpecificInit() {
+	// NOP on windows for now.
+	return
+}
+
 func (p *Process) Start() {
 	command := ShellInvocationCommand(p.Root, p.Command)
 	p.cmd = exec.Command(command[0], command[1:]...)
