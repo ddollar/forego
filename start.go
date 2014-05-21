@@ -79,9 +79,7 @@ func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFacto
 	wg.Add(1)
 	port := flagPort + (idx * 100)
 	ps := NewProcess(proc.Command, env)
-	procName := strings.Join([]string{
-		proc.Name,
-		strconv.FormatInt(int64(procNum+1), 10)}, ".")
+	procName := fmt.Sprint(proc.Name, ".", procNum+1)
 	processes[procName] = ps
 	ps.Env["PORT"] = strconv.Itoa(port)
 	ps.Root = filepath.Dir(flagProcfile)
@@ -89,6 +87,7 @@ func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFacto
 	ps.Stdout = of.CreateOutlet(procName, idx, false)
 	ps.Stderr = of.CreateOutlet(procName, idx, true)
 	ps.Start()
+
 	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
 	go func(proc ProcfileEntry, ps *Process) {
 		ps.Wait()
