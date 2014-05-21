@@ -28,10 +28,6 @@ func (p *Process) Start() error {
 }
 
 func (p *Process) Signal(signal syscall.Signal) {
-	group, _ := os.FindProcess(-1 * p.Pid())
+	group, _ := os.FindProcess(-1 * p.Process.Pid)
 	group.Signal(signal)
-}
-
-func (p *Process) Pid() int {
-	return p.Process.Pid
 }
