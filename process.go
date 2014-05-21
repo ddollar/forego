@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -49,14 +48,4 @@ func (p *Process) shellArgument() string {
 	} else {
 		return "-c"
 	}
-}
-
-func (p *Process) envAsArray() (env []string) {
-	for _, pair := range os.Environ() {
-		env = append(env, pair)
-	}
-	for name, val := range p.Env {
-		env = append(env, fmt.Sprintf("%s=%s", name, val))
-	}
-	return
 }
