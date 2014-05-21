@@ -3,9 +3,6 @@ package main
 // +build windows
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
 	"syscall"
 )
 
