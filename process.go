@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"syscall"
 )
 
 type Process struct {
@@ -30,8 +31,9 @@ func NewProcess(command string, env Env) (p *Process) {
 	return
 }
 
-func (p *Process) Running() bool {
-	return (p.cmd.Process != nil)
+func (p *Process) Signal(signal syscall.Signal) {
+	group, _ := os.FindProcess(-1 * p.Pid())
+	group.Signal(signal)
 }
 
 func (p *Process) Pid() int {

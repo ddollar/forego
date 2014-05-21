@@ -22,11 +22,6 @@ func (p *Process) Start() {
 	p.cmd.Start()
 }
 
-func (p *Process) Signal(signal syscall.Signal) {
-	group, _ := os.FindProcess(-1 * p.cmd.Process.Pid)
-	group.Signal(signal)
-}
-
 func (p *Process) SendSigTerm() {
 	panic("SendSigTerm() not implemented on this platform")
 }

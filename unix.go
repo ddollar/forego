@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
@@ -25,13 +24,6 @@ func (p *Process) Start() {
 		p.cmd.SysProcAttr.Setsid = true
 	}
 	p.cmd.Start()
-}
-
-func (p *Process) Signal(signal syscall.Signal) {
-	if p.Running() {
-		group, _ := os.FindProcess(-1 * p.Pid())
-		group.Signal(signal)
-	}
 }
 
 func (p *Process) SendSigTerm() {
