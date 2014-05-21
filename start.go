@@ -17,9 +17,6 @@ const shutdownGraceTime = 3 * time.Second
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
-var shutdownNow bool
-
-var processes = map[string]*Process{}
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -73,9 +70,33 @@ func parseConcurrency(value string) (map[string]int, error) {
 }
 
 type Forego struct {
-	shutdown sync.Once
+	shutdown sync.Once     // Closes teardown exactly once
 	teardown chan struct{} // barrier: closed when shutting down
-	wg       sync.WaitGroup
+
+	wg sync.WaitGroup
+}
+
+func (f *Forego) SignalShutdown() {
+	f.shutdown.Do(func() { close(f.teardown) })
+}
+
+func (f *Forego) monitorInterrupt() {
+	handler := make(chan os.Signal, 1)
+	signal.Notify(handler, os.Interrupt)
+
+	first := true
+
+	for sig := range handler {
+		switch sig {
+		case os.Interrupt:
+			fmt.Println("      | ctrl-c detected")
+
+			if !first {
+
+			}
+			f.SignalShutdown()
+		}
+	}
 }
 
 func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
@@ -83,49 +104,59 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 	ps := NewProcess(proc.Command, env)
 	procName := fmt.Sprint(proc.Name, ".", procNum+1)
-	processes[procName] = ps
 	ps.Env["PORT"] = strconv.Itoa(port)
 	ps.Root = filepath.Dir(flagProcfile)
 	ps.Stdin = nil
 	ps.Stdout = of.CreateOutlet(procName, idx, false)
 	ps.Stderr = of.CreateOutlet(procName, idx, true)
-	ps.Start()
 
 	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
 
+	finished := make(chan struct{}) // closed on process exit
+
+	ps.Start()
+	go func() {
+		defer close(finished)
+		ps.Wait()
+	}()
+
 	f.wg.Add(1)
-	go func(proc ProcfileEntry, ps *Process) {
+	go func() {
 		defer f.wg.Done()
 
-		ps.Wait()
+		// Prevent goroutine from exiting before process has finished.
+		defer func() { <-finished }()
 
-		if flagRestart && !shutdownNow {
-			delete(processes, proc.Name)
-			f.startProcess(idx, procNum, proc, env, of)
-			return
+		select {
+		case <-finished:
+			if flagRestart {
+				f.startProcess(idx, procNum, proc, env, of)
+				return
+			} else {
+				f.SignalShutdown()
+			}
+
+		case <-f.teardown:
+			// Forego tearing down
+
+			if !osHaveSigTerm {
+				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
+				ps.cmd.Process.Kill()
+				return
+			}
+
+			of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", procName))
+			ps.SendSigTerm()
+
+			// Give the process a chance to exit, otherwise kill it.
+			select {
+			case <-time.After(shutdownGraceTime):
+				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
+				ps.SendSigKill()
+			case <-finished:
+			}
 		}
-
-		delete(processes, proc.Name)
-		f.SignalShutdown()
-	}(proc, ps)
-}
-
-func (f *Forego) SignalShutdown() {
-	f.shutdown.Do(func() {
-		close(f.teardown)
-	})
-}
-
-func (f *Forego) monitorInterrupt() {
-	handler := make(chan os.Signal, 1)
-	signal.Notify(handler, os.Interrupt)
-	for sig := range handler {
-		switch sig {
-		case os.Interrupt:
-			fmt.Println("      | ctrl-c detected")
-			f.SignalShutdown()
-		}
-	}
+	}()
 }
 
 func runStart(cmd *Command, args []string) {
@@ -175,13 +206,6 @@ func runStart(cmd *Command, args []string) {
 
 	<-f.teardown
 	of.SystemOutput("shutting down")
-	ShutdownProcesses(of)
 
 	f.wg.Wait()
-}
-
-func ShutdownProcesses(of *OutletFactory) {
-	for name, p := range processes {
-		ShutdownProcess(of, p, name)
-	}
 }

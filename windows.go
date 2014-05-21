@@ -9,6 +9,8 @@ import (
 	"syscall"
 )
 
+const osHaveSigTerm = false
+
 func (p *Process) Start() {
 	command := []string{"cmd", "/C", p.Command}
 	p.cmd = exec.Command(command[0], command[1:]...)
@@ -25,7 +27,10 @@ func (p *Process) Signal(signal syscall.Signal) {
 	group.Signal(signal)
 }
 
-func ShutdownProcess(of *OutletFactory, ps *Process, name string) {
-	of.SystemOutput(fmt.Sprintf("terminating %s", name))
-	ps.cmd.Process.Signal(os.Kill)
+func (p *Process) SendSigTerm() {
+	panic("SendSigTerm() not implemented on this platform")
+}
+
+func (p *Process) SendSigKill() {
+	p.Signal(syscall.SIGKILL)
 }

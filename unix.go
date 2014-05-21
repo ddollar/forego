@@ -8,8 +8,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"syscall"
-	"time"
 )
+
+const osHaveSigTerm = true
 
 func (p *Process) Start() {
 	command := []string{"/bin/bash", p.shellArgument(), fmt.Sprintf("source \"%s\" 2>/dev/null; %s", filepath.Join(p.Root, ".profile"), p.Command)}
@@ -33,12 +34,10 @@ func (p *Process) Signal(signal syscall.Signal) {
 	}
 }
 
-func ShutdownProcess(of *OutletFactory, ps *Process, name string) {
-	of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
-	ps.Signal(syscall.SIGTERM)
-	go func() {
-		time.Sleep(shutdownGraceTime)
-		of.SystemOutput(fmt.Sprintf("sending SIGKILL to %s", name))
-		ps.Signal(syscall.SIGKILL)
-	}()
+func (p *Process) SendSigTerm() {
+	p.Signal(syscall.SIGTERM)
+}
+
+func (p *Process) SendSigKill() {
+	p.Signal(syscall.SIGKILL)
 }
