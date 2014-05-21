@@ -27,7 +27,10 @@ func (p *Process) Start() error {
 	return p.Cmd.Start()
 }
 
-func (p *Process) Signal(signal syscall.Signal) {
-	group, _ := os.FindProcess(-1 * p.Process.Pid)
-	group.Signal(signal)
+func (p *Process) Signal(signal syscall.Signal) error {
+	group, err := os.FindProcess(-1 * p.Process.Pid)
+	if err == nil {
+		err = group.Signal(signal)
+	}
+	return err
 }
