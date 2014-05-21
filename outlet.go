@@ -13,6 +13,8 @@ import (
 type OutletFactory struct {
 	Outlets map[string]*Outlet
 	Padding int
+
+	sync.Mutex
 }
 
 type Outlet struct {
@@ -21,8 +23,6 @@ type Outlet struct {
 	IsError bool
 	Factory *OutletFactory
 }
-
-var mx sync.Mutex
 
 var colors = []ct.Color{
 	ct.Cyan,
@@ -68,8 +68,8 @@ func (of *OutletFactory) ErrorOutput(str string) {
 
 // Write out a single coloured line
 func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, isError bool) {
-	mx.Lock()
-	defer mx.Unlock()
+	of.Lock()
+	defer of.Unlock()
 
 	ct.ChangeColor(leftC, true, ct.None, false)
 	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
