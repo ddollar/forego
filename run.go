@@ -35,12 +35,15 @@ func runRun(cmd *Command, args []string) {
 	env, err := ReadEnv(flagEnv)
 	handleError(err)
 
-	ps := NewProcess(strings.Join(args, " "), env)
-	ps.Interactive = true
-	ps.Root = workDir
+	const interactive = true
+	ps := NewProcess(workDir, strings.Join(args, " "), env, interactive)
 	ps.Stdin = os.Stdin
 	ps.Stdout = os.Stdout
 	ps.Stderr = os.Stderr
-	ps.Start()
-	ps.Wait()
+
+	err = ps.Start()
+	handleError(err)
+
+	err = ps.Wait()
+	handleError(err)
 }

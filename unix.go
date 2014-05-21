@@ -23,8 +23,8 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 
 func (p *Process) PlatformSpecificInit() {
 	if !p.Interactive {
-		p.cmd.SysProcAttr = &syscall.SysProcAttr{}
-		p.cmd.SysProcAttr.Setsid = true
+		p.SysProcAttr = &syscall.SysProcAttr{}
+		p.SysProcAttr.Setsid = true
 	}
 	return
 }

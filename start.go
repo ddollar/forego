@@ -109,10 +109,11 @@ func (f *Forego) monitorInterrupt() {
 func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
 	port := flagPort + (idx * 100)
 
-	ps := NewProcess(proc.Command, env)
+	const interactive = false
+	workDir := filepath.Dir(flagProcfile)
+	ps := NewProcess(workDir, proc.Command, env, interactive)
 	procName := fmt.Sprint(proc.Name, ".", procNum+1)
 	ps.Env["PORT"] = strconv.Itoa(port)
-	ps.Root = filepath.Dir(flagProcfile)
 	ps.Stdin = nil
 	ps.Stdout = of.CreateOutlet(procName, idx, false)
 	ps.Stderr = of.CreateOutlet(procName, idx, true)
@@ -148,7 +149,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 			if !osHaveSigTerm {
 				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
-				ps.cmd.Process.Kill()
+				ps.Process.Kill()
 				return
 			}
 
