@@ -70,8 +70,9 @@ func parseConcurrency(value string) (map[string]int, error) {
 }
 
 type Forego struct {
-	shutdown sync.Once     // Closes teardown exactly once
-	teardown chan struct{} // barrier: closed when shutting down
+	shutdown    sync.Once     // Closes teardown exactly once
+	teardown    chan struct{} // barrier: closed when shutting down
+	teardownNow chan struct{} // barrier: second CTRL-C. More urgent.
 
 	wg sync.WaitGroup
 }
@@ -85,6 +86,7 @@ func (f *Forego) monitorInterrupt() {
 	signal.Notify(handler, os.Interrupt)
 
 	first := true
+	var once sync.Once
 
 	for sig := range handler {
 		switch sig {
@@ -92,9 +94,10 @@ func (f *Forego) monitorInterrupt() {
 			fmt.Println("      | ctrl-c detected")
 
 			if !first {
-
+				once.Do(func() { close(f.teardownNow) })
 			}
 			f.SignalShutdown()
+			first = false
 		}
 	}
 }
@@ -153,6 +156,9 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 			case <-time.After(shutdownGraceTime):
 				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
 				ps.SendSigKill()
+			case <-f.teardownNow:
+				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
+				ps.SendSigKill()
 			case <-finished:
 			}
 		}
@@ -179,7 +185,8 @@ func runStart(cmd *Command, args []string) {
 	of.Padding = pf.LongestProcessName()
 
 	f := &Forego{
-		teardown: make(chan struct{}),
+		teardown:    make(chan struct{}),
+		teardownNow: make(chan struct{}),
 	}
 
 	go f.monitorInterrupt()
