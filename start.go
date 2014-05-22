@@ -72,18 +72,9 @@ func parseConcurrency(value string) (map[string]int, error) {
 type Forego struct {
 	outletFactory *OutletFactory
 
-	shutdown    sync.Once     // Closes teardown exactly once
-	teardown    chan struct{} // barrier: closed when shutting down
-	teardownNow chan struct{} // barrier: second CTRL-C. More urgent.
+	teardown, teardownNow Barrier // signal shutting down
 
 	wg sync.WaitGroup
-}
-
-func (f *Forego) SignalShutdown() {
-	f.shutdown.Do(func() {
-		f.outletFactory.SystemOutput("shutting down")
-		close(f.teardown)
-	})
 }
 
 func (f *Forego) monitorInterrupt() {
@@ -91,17 +82,16 @@ func (f *Forego) monitorInterrupt() {
 	signal.Notify(handler, os.Interrupt)
 
 	first := true
-	var once sync.Once
 
 	for sig := range handler {
 		switch sig {
 		case os.Interrupt:
 			fmt.Println("      | ctrl-c detected")
 
+			f.teardown.Fall()
 			if !first {
-				once.Do(func() { close(f.teardownNow) })
+				f.teardownNow.Fall()
 			}
-			f.SignalShutdown()
 			first = false
 		}
 	}
@@ -152,7 +142,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 		// Prevent goroutine from exiting before process has finished.
 		defer func() { <-finished }()
-		defer f.SignalShutdown()
+		defer f.teardown.Fall()
 
 		select {
 		case <-finished:
@@ -161,7 +151,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 				return
 			}
 
-		case <-f.teardown:
+		case <-f.teardown.Barrier():
 			// Forego tearing down
 
 			if !osHaveSigTerm {
@@ -175,10 +165,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 			// Give the process a chance to exit, otherwise kill it.
 			select {
-			case <-time.After(shutdownGraceTime):
-				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
-				ps.SendSigKill()
-			case <-f.teardownNow:
+			case <-f.teardownNow.Barrier():
 				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
 				ps.SendSigKill()
 			case <-finished:
@@ -208,12 +195,18 @@ func runStart(cmd *Command, args []string) {
 
 	f := &Forego{
 		outletFactory: of,
-
-		teardown:    make(chan struct{}),
-		teardownNow: make(chan struct{}),
 	}
 
 	go f.monitorInterrupt()
+
+	// When teardown fires, start the grace timer
+	f.teardown.FallHook = func() {
+		go func() {
+			time.Sleep(shutdownGraceTime)
+			of.SystemOutput("Grace time expired")
+			f.teardownNow.Fall()
+		}()
+	}
 
 	var singleton string = ""
 	if len(args) > 0 {
@@ -235,7 +228,7 @@ func runStart(cmd *Command, args []string) {
 		}
 	}
 
-	<-f.teardown
+	<-f.teardown.Barrier()
 
 	f.wg.Wait()
 }
