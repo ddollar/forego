@@ -126,7 +126,12 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 	finished := make(chan struct{}) // closed on process exit
 
-	ps.Start()
+	err = ps.Start()
+	if err != nil {
+		f.teardown.Fall()
+		of.SystemOutput(fmt.Sprint("Failed to start ", procName, ": ", err))
+		return
+	}
 
 	f.wg.Add(1)
 	go func() {
