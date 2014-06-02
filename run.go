@@ -24,19 +24,26 @@ func init() {
 }
 
 func runRun(cmd *Command, args []string) {
+	workDir, err := os.Getwd()
+	if err != nil {
+		handleError(err)
+	}
 	if flagEnv == "" {
-		root, _ := os.Getwd()
-		flagEnv = filepath.Join(root, ".env")
+		flagEnv = filepath.Join(workDir, ".env")
 	}
 
 	env, err := ReadEnv(flagEnv)
 	handleError(err)
 
-	ps := NewProcess(strings.Join(args, " "), env)
-	ps.Interactive = true
+	const interactive = true
+	ps := NewProcess(workDir, strings.Join(args, " "), env, interactive)
 	ps.Stdin = os.Stdin
 	ps.Stdout = os.Stdout
 	ps.Stderr = os.Stderr
-	ps.Start()
-	ps.Wait()
+
+	err = ps.Start()
+	handleError(err)
+
+	err = ps.Wait()
+	handleError(err)
 }

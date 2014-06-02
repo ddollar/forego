@@ -1,62 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"io"
 	"os"
 	"os/exec"
+	"syscall"
 )
 
 type Process struct {
 	Command     string
 	Env         Env
 	Interactive bool
-	Stdin       io.Reader
-	Stdout      io.Writer
-	Stderr      io.Writer
-	Root        string
 
-	cmd *exec.Cmd
+	*exec.Cmd
 }
 
-func NewProcess(command string, env Env) (p *Process) {
-	p = new(Process)
-	p.Command = command
-	p.Env = env
-	p.Interactive = false
-	p.Stdin = os.Stdin
-	p.Stdout = os.Stdout
-	p.Stderr = os.Stderr
-	p.Root, _ = os.Getwd()
-	return
-}
-
-func (p *Process) Running() bool {
-	return (p.cmd.Process != nil)
-}
-
-func (p *Process) Pid() int {
-	return p.cmd.Process.Pid
-}
-
-func (p *Process) Wait() {
-	p.cmd.Wait()
-}
-
-func (p *Process) shellArgument() string {
-	if p.Interactive {
-		return "-ic"
-	} else {
-		return "-c"
+func NewProcess(workdir, command string, env Env, interactive bool) (p *Process) {
+	argv := ShellInvocationCommand(interactive, workdir, command)
+	return &Process{
+		command, env, interactive, exec.Command(argv[0], argv[1:]...),
 	}
 }
 
-func (p *Process) envAsArray() (env []string) {
-	for _, pair := range os.Environ() {
-		env = append(env, pair)
+func (p *Process) Start() error {
+	p.Cmd.Env = p.Env.asArray()
+	p.PlatformSpecificInit()
+	return p.Cmd.Start()
+}
+
+func (p *Process) Signal(signal syscall.Signal) error {
+	group, err := os.FindProcess(-1 * p.Process.Pid)
+	if err == nil {
+		err = group.Signal(signal)
 	}
-	for name, val := range p.Env {
-		env = append(env, fmt.Sprintf("%s=%s", name, val))
-	}
-	return
+	return err
 }

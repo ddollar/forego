@@ -17,11 +17,6 @@ const shutdownGraceTime = 3 * time.Second
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
-var shutdownNow bool
-
-var processes = map[string]*Process{}
-var shutdown_mutex = new(sync.Mutex)
-var wg sync.WaitGroup
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -74,38 +69,109 @@ func parseConcurrency(value string) (map[string]int, error) {
 	return concurrency, nil
 }
 
-func startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
-	shutdown_mutex.Lock()
-	wg.Add(1)
-	port := flagPort + (idx * 100)
-	ps := NewProcess(proc.Command, env)
-	procName := strings.Join([]string{
-		proc.Name,
-		strconv.FormatInt(int64(procNum+1), 10)}, ".")
-	processes[procName] = ps
-	ps.Env["PORT"] = strconv.Itoa(port)
-	ps.Root = filepath.Dir(flagProcfile)
-	ps.Stdin = nil
-	ps.Stdout = of.CreateOutlet(procName, idx, false)
-	ps.Stderr = of.CreateOutlet(procName, idx, true)
-	ps.Start()
-	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
-	go func(proc ProcfileEntry, ps *Process) {
-		ps.Wait()
+type Forego struct {
+	outletFactory *OutletFactory
 
-		if flagRestart && !shutdownNow {
-			delete(processes, proc.Name)
-			startProcess(idx, procNum, proc, env, of)
-			wg.Done()
-			return
+	teardown, teardownNow Barrier // signal shutting down
+
+	wg sync.WaitGroup
+}
+
+func (f *Forego) monitorInterrupt() {
+	handler := make(chan os.Signal, 1)
+	signal.Notify(handler, os.Interrupt)
+
+	first := true
+
+	for sig := range handler {
+		switch sig {
+		case os.Interrupt:
+			fmt.Println("      | ctrl-c detected")
+
+			f.teardown.Fall()
+			if !first {
+				f.teardownNow.Fall()
+			}
+			first = false
 		}
+	}
+}
 
-		wg.Done()
-		delete(processes, proc.Name)
-		ShutdownProcesses(of)
+func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
+	port := flagPort + (idx * 100)
 
-	}(proc, ps)
-	shutdown_mutex.Unlock()
+	const interactive = false
+	workDir := filepath.Dir(flagProcfile)
+	ps := NewProcess(workDir, proc.Command, env, interactive)
+	procName := fmt.Sprint(proc.Name, ".", procNum+1)
+	ps.Env["PORT"] = strconv.Itoa(port)
+
+	ps.Stdin = nil
+
+	stdout, err := ps.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	stderr, err := ps.StderrPipe()
+	if err != nil {
+		panic(err)
+	}
+
+	pipeWait := new(sync.WaitGroup)
+	pipeWait.Add(2)
+	go of.LineReader(pipeWait, procName, idx, stdout, false)
+	go of.LineReader(pipeWait, procName, idx, stderr, true)
+
+	of.SystemOutput(fmt.Sprintf("starting %s on port %d", procName, port))
+
+	finished := make(chan struct{}) // closed on process exit
+
+	ps.Start()
+
+	f.wg.Add(1)
+	go func() {
+		defer f.wg.Done()
+		defer close(finished)
+		pipeWait.Wait()
+		ps.Wait()
+	}()
+
+	f.wg.Add(1)
+	go func() {
+		defer f.wg.Done()
+
+		// Prevent goroutine from exiting before process has finished.
+		defer func() { <-finished }()
+		defer f.teardown.Fall()
+
+		select {
+		case <-finished:
+			if flagRestart {
+				f.startProcess(idx, procNum, proc, env, of)
+				return
+			}
+
+		case <-f.teardown.Barrier():
+			// Forego tearing down
+
+			if !osHaveSigTerm {
+				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
+				ps.Process.Kill()
+				return
+			}
+
+			of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", procName))
+			ps.SendSigTerm()
+
+			// Give the process a chance to exit, otherwise kill it.
+			select {
+			case <-f.teardownNow.Barrier():
+				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
+				ps.SendSigKill()
+			case <-finished:
+			}
+		}
+	}()
 }
 
 func runStart(cmd *Command, args []string) {
@@ -127,19 +193,20 @@ func runStart(cmd *Command, args []string) {
 	of := NewOutletFactory()
 	of.Padding = pf.LongestProcessName()
 
-	handler := make(chan os.Signal, 1)
-	signal.Notify(handler, os.Interrupt)
+	f := &Forego{
+		outletFactory: of,
+	}
 
-	go func() {
-		for sig := range handler {
-			switch sig {
-			case os.Interrupt:
-				shutdownNow = true
-				fmt.Println("      | ctrl-c detected")
-				go func() { ShutdownProcesses(of) }()
-			}
-		}
-	}()
+	go f.monitorInterrupt()
+
+	// When teardown fires, start the grace timer
+	f.teardown.FallHook = func() {
+		go func() {
+			time.Sleep(shutdownGraceTime)
+			of.SystemOutput("Grace time expired")
+			f.teardownNow.Fall()
+		}()
+	}
 
 	var singleton string = ""
 	if len(args) > 0 {
@@ -156,10 +223,12 @@ func runStart(cmd *Command, args []string) {
 		}
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
-				startProcess(idx, i, proc, env, of)
+				f.startProcess(idx, i, proc, env, of)
 			}
 		}
 	}
 
-	wg.Wait()
+	<-f.teardown.Barrier()
+
+	f.wg.Wait()
 }

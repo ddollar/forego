@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/subosito/gotenv"
 	"os"
 	"regexp"
@@ -24,4 +25,14 @@ func ReadEnv(filename string) (Env, error) {
 		env[key] = val
 	}
 	return env, nil
+}
+
+func (e *Env) asArray() (env []string) {
+	for _, pair := range os.Environ() {
+		env = append(env, pair)
+	}
+	for name, val := range *e {
+		env = append(env, fmt.Sprintf("%s=%s", name, val))
+	}
+	return
 }
