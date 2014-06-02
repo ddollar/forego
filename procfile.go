@@ -30,13 +30,14 @@ func ReadProcfile(filename string) (*Procfile, error) {
 	return parseProcfile(fd)
 }
 
-func (pf *Procfile) HasProcess(name string) (exists bool) {
-	for _, entry := range pf.Entries {
+func (pf *Procfile) GetProcess(name string) (entry ProcfileEntry, ok bool) {
+	for _, entry = range pf.Entries {
 		if name == entry.Name {
-			return true
+			ok = true
+			return
 		}
 	}
-	return false
+	return
 }
 
 func (pf *Procfile) LongestProcessName(concurrency map[string]int) (longest int) {
