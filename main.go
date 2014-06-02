@@ -7,9 +7,12 @@ import (
 var commands = []*Command{
 	cmdStart,
 	cmdRun,
-	cmdUpdate,
 	cmdVersion,
 	cmdHelp,
+}
+
+func RegisterCommand(c *Command) {
+	commands = append(commands, c)
 }
 
 func main() {

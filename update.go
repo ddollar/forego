@@ -1,3 +1,5 @@
+// +build !nodist
+
 package main
 
 import (
@@ -19,6 +21,7 @@ Examples:
 }
 
 func init() {
+	RegisterCommand(cmdUpdate)
 }
 
 func runUpdate(cmd *Command, args []string) {
