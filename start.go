@@ -20,7 +20,7 @@ var flagRestart bool
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-r]",
+	Usage: "start [process name]... [-f procfile] [-e env] [-c concurrency] [-p port] [-r]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
@@ -208,23 +208,28 @@ func runStart(cmd *Command, args []string) {
 		}()
 	}
 
-	var singleton string = ""
+	var procsToRun = pf.Entries
+
 	if len(args) > 0 {
-		singleton = args[0]
-		if !pf.HasProcess(singleton) {
-			of.ErrorOutput(fmt.Sprintf("no such process: %s", singleton))
+
+		procsToRun = []ProcfileEntry{}
+		for _, arg := range args {
+			proc, ok := pf.GetProcess(arg)
+			if !ok {
+				of.ErrorOutput(fmt.Sprintf("Unknown proc '%s'", arg))
+				return
+			}
+			procsToRun = append(procsToRun, proc)
 		}
 	}
 
-	for idx, proc := range pf.Entries {
+	for idx, proc := range procsToRun {
 		numProcs := 1
 		if value, ok := concurrency[proc.Name]; ok {
 			numProcs = value
 		}
 		for i := 0; i < numProcs; i++ {
-			if (singleton == "") || (singleton == proc.Name) {
-				f.startProcess(idx, i, proc, env, of)
-			}
+			f.startProcess(idx, i, proc, env, of)
 		}
 	}
 
