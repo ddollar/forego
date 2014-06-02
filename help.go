@@ -14,6 +14,7 @@ var cmdHelp = &Command{
 }
 
 func init() {
+	RegisterCommand(cmdHelp)
 	cmdHelp.Run = runHelp // break init loop
 }
 

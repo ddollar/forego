@@ -34,6 +34,8 @@ Examples:
 }
 
 func init() {
+	RegisterCommand(cmdStart)
+
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
 	cmdStart.Flag.StringVar(&flagEnv, "e", "", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")

@@ -4,12 +4,7 @@ import (
 	"os"
 )
 
-var commands = []*Command{
-	cmdStart,
-	cmdRun,
-	cmdVersion,
-	cmdHelp,
-}
+var commands = []*Command{}
 
 func RegisterCommand(c *Command) {
 	commands = append(commands, c)

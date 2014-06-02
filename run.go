@@ -20,6 +20,8 @@ Examples:
 }
 
 func init() {
+	RegisterCommand(cmdRun)
+
 	cmdRun.Flag.StringVar(&flagEnv, "e", ".env", "env")
 }
 
