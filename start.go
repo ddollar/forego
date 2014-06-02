@@ -191,7 +191,7 @@ func runStart(cmd *Command, args []string) {
 	handleError(err)
 
 	of := NewOutletFactory()
-	of.Padding = pf.LongestProcessName()
+	of.Padding = pf.LongestProcessName(concurrency)
 
 	f := &Forego{
 		outletFactory: of,
