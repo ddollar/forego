@@ -50,13 +50,13 @@ func parseConcurrency(value string) (map[string]int, error) {
 	parts := strings.Split(value, ",")
 	for _, part := range parts {
 		if !strings.Contains(part, "=") {
-			return concurrency, errors.New("Parsing concurency")
+			return concurrency, errors.New("Concurrency should be in the format: foo=1,bar=2")
 		}
 
 		nameValue := strings.Split(part, "=")
 		n, v := strings.TrimSpace(nameValue[0]), strings.TrimSpace(nameValue[1])
 		if n == "" || v == "" {
-			return concurrency, errors.New("Parsing concurency")
+			return concurrency, errors.New("Concurrency should be in the format: foo=1,bar=2")
 		}
 
 		numProcs, err := strconv.ParseInt(v, 10, 16)
