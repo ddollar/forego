@@ -1,0 +1,2 @@
+stdout1: ruby ./stdout.rb
+stdout2: ruby ./stdout.rb
