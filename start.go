@@ -221,8 +221,16 @@ func runStart(cmd *Command, args []string) {
 		}
 	}
 
+	defaultConcurrency := 1
+
+	for name, num := range concurrency {
+		if name == "all" {
+			defaultConcurrency = num
+		}
+	}
+
 	for idx, proc := range pf.Entries {
-		numProcs := 1
+		numProcs := defaultConcurrency
 		if value, ok := concurrency[proc.Name]; ok {
 			numProcs = value
 		}
