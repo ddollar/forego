@@ -5,7 +5,7 @@
 		{
 			"ImportPath": "bitbucket.org/kardianos/osext",
 			"Comment": "null-7",
-			"Rev": "84d8cbacbe13"
+			"Rev": "84d8cbacbe137d1c00cdc0762b3ad585a4d64418"
 		},
 		{
 			"ImportPath": "github.com/daviddengcn/go-colortext",
@@ -13,6 +13,7 @@
 		},
 		{
 			"ImportPath": "github.com/ddollar/dist",
+			"Comment": "v0.2.0",
 			"Rev": "95b3220dbc9bb70c4cbda93b4064655a1ff86a06"
 		},
 		{
@@ -29,6 +30,7 @@
 		},
 		{
 			"ImportPath": "github.com/kr/pretty",
+			"Comment": "go.weekly.2011-12-22-18-gbc9499c",
 			"Rev": "bc9499caa0f45ee5edb2f0209fbd61fbf3d9018f"
 		},
 		{
@@ -37,6 +39,7 @@
 		},
 		{
 			"ImportPath": "github.com/subosito/gotenv",
+			"Comment": "v0.1.0",
 			"Rev": "a37a0e8fb3298354bf97daad07b38feb2d0fa263"
 		}
 	]
