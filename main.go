@@ -1,8 +1,6 @@
 package main
 
-import (
-	"os"
-)
+import "os"
 
 var commands = []*Command{
 	cmdStart,
@@ -12,13 +10,22 @@ var commands = []*Command{
 	cmdHelp,
 }
 
+var allowUpdate string = "true"
+
 func main() {
 	args := os.Args[1:]
 	if len(args) < 1 {
 		usage()
 	}
 
+	if allowUpdate == "false" {
+		cmdUpdate.Disabled = true
+	}
+
 	for _, cmd := range commands {
+		if cmd.Disabled == true {
+			continue
+		}
 		if cmd.Name() == args[0] && cmd.Run != nil {
 			cmd.Flag.Usage = func() {
 				cmd.printUsage()

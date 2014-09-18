@@ -14,9 +14,10 @@ type Command struct {
 	Run  func(cmd *Command, args []string)
 	Flag flag.FlagSet
 
-	Usage string // first word is the command name
-	Short string // `forego help` output
-	Long  string // `forego help cmd` output
+	Disabled bool
+	Usage    string // first word is the command name
+	Short    string // `forego help` output
+	Long     string // `forego help cmd` output
 }
 
 func (c *Command) printUsage() {
