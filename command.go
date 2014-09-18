@@ -37,7 +37,7 @@ func (c *Command) Name() string {
 }
 
 func (c *Command) Runnable() bool {
-	return c.Run != nil
+	return c.Run != nil && c.Disabled != true
 }
 
 func (c *Command) List() bool {
