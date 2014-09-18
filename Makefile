@@ -16,9 +16,9 @@ install: forego
 lint: $(SRC)
 	go fmt
 
-test: lint
+test: lint build
 	go test ./... -cover
-	cd eg && forego start
+	cd eg && ../forego start
 
 $(BIN): $(SRC)
 	godep go build -o $@
