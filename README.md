@@ -1,4 +1,5 @@
 ## forego
+[![Build Status](https://travis-ci.org/dickeyxxx/forego.svg)](https://travis-ci.org/dickeyxxx/forego)
 
 Foreman in Go.
 

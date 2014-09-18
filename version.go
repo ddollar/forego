@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 var Version = "dev"
 
 var cmdVersion = &Command{
@@ -19,9 +15,6 @@ Examples:
 `,
 }
 
-func init() {
-}
-
 func runVersion(cmd *Command, args []string) {
-	fmt.Println(Version)
+	Println(Version)
 }
