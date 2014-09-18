@@ -4,6 +4,10 @@ Foreman in Go.
 
 ### Installation
 
+##### OSX Homebrew
+
+    brew install forego
+
 ##### Precompiled Binaries
 
 * [Linux 32bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-386/forego)
