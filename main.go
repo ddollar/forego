@@ -2,12 +2,10 @@ package main
 
 import "os"
 
-var commands = []*Command{
-	cmdStart,
-	cmdRun,
-	cmdUpdate,
-	cmdVersion,
-	cmdHelp,
+var commands = []*Command{}
+
+func RegisterCommand(c *Command) {
+	commands = append(commands, c)
 }
 
 var allowUpdate string = "true"

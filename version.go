@@ -20,6 +20,7 @@ Examples:
 }
 
 func init() {
+	RegisterCommand(cmdVersion)
 }
 
 func runVersion(cmd *Command, args []string) {
