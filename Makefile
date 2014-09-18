@@ -1,6 +1,8 @@
 BIN = forego
 SRC = $(shell ls *.go)
 
+.PHONY: all build clean install test lint
+
 all: build
 
 build: $(BIN)
@@ -13,6 +15,10 @@ install: forego
 
 lint: $(SRC)
 	go fmt
+
+test: lint build
+	go test ./... -cover
+	cd eg && ../forego start
 
 $(BIN): $(SRC)
 	godep go build -o $@
