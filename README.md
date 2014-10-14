@@ -24,4 +24,10 @@ Foreman in Go.
 
 ### Usage
 
+    $ cat Procfile
+    web: bin/web start -p $PORT
+    worker: bin/worker queue=FOO
+
     $ forego start
+    web    | listening on port 5000
+    worker | listening to queue FOO
