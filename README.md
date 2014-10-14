@@ -24,4 +24,18 @@ Foreman in Go.
 
 ### Usage
 
+Forego is compatible with the Procfile file format.  This is also what the foreman Ruby gem uses.  There's documentation [here](http://ddollar.github.io/foreman/#PROCFILE) but here's a simple shell example that should get you started.  Create a file named Procfile in your project's top-level directory.
+
+    some_server: while [ true ]; do sleep 10; done
+    another_process: while [ true ]; do sleep 10; done
+
+When you are ready to start your processes defined in Procfile run:
+
     $ forego start
+
+Forego also comes with command line help about starting processes:
+
+    $ forego help start
+
+For more help, see `forego help`
+
