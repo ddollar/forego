@@ -24,6 +24,10 @@ func init() {
 }
 
 func runRun(cmd *Command, args []string) {
+	if len(args) < 1 {
+		cmd.printUsage()
+		os.Exit(1)
+	}
 	workDir, err := os.Getwd()
 	if err != nil {
 		handleError(err)
