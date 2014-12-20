@@ -13,6 +13,7 @@ import (
 )
 
 const shutdownGraceTime = 3 * time.Second
+const defaultPort = 5000
 
 var flagPort int
 var flagConcurrency string
@@ -37,7 +38,7 @@ Examples:
 func init() {
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
 	cmdStart.Flag.Var(&envs, "e", "env")
-	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")
+	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
 }
@@ -98,8 +99,22 @@ func (f *Forego) monitorInterrupt() {
 	}
 }
 
+func basePort(env Env) (int, error) {
+	if flagPort != defaultPort {
+		return flagPort, nil
+	} else if env["PORT"] != "" {
+		return strconv.Atoi(env["PORT"])
+	}
+	return defaultPort, nil
+}
+
 func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
-	port := flagPort + (idx * 100)
+	port, err := basePort(env)
+	if err != nil {
+		panic(err)
+	}
+
+	port = port + (idx * 100)
 
 	const interactive = false
 	workDir := filepath.Dir(flagProcfile)
