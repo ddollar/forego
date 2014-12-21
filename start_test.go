@@ -106,3 +106,20 @@ func TestParseConcurrencyFlagNoValue(t *testing.T) {
 	}
 
 }
+
+func TestMultipleEnvironmentFiles(t *testing.T) {
+	envs := []string{"fixtures/envs/.env1", "fixtures/envs/.env2"}
+	env, err := parseEnvironment(envs)
+
+	if err != nil {
+		t.Fatalf("Could not read environments: %s", err)
+	}
+
+	if env["env1"] == "" {
+		t.Fatalf("$env1 should be present and is not")
+	}
+
+	if env["env2"] == "" {
+		t.Fatalf("$env2 should be present and is not")
+	}
+}

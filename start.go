@@ -14,9 +14,21 @@ import (
 
 const shutdownGraceTime = 3 * time.Second
 
+type envFiles []string
+
+func (e *envFiles) String() string {
+	return fmt.Sprintf("%s", *e)
+}
+
+func (e *envFiles) Set(value string) error {
+	*e = append(*e, fullPath(value))
+	return nil
+}
+
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
+var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -35,7 +47,7 @@ Examples:
 
 func init() {
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
-	cmdStart.Flag.StringVar(&flagEnv, "e", "", "env")
+	cmdStart.Flag.Var(&envs, "e", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
@@ -179,20 +191,46 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 	}()
 }
 
-func runStart(cmd *Command, args []string) {
+func fullPath(file string) string {
 	root := filepath.Dir(flagProcfile)
+	return filepath.Join(root, file)
+}
 
-	if flagEnv == "" {
-		flagEnv = filepath.Join(root, ".env")
+func parseEnvironment(files []string) (Env, error) {
+	if len(files) == 0 {
+		env, err := ReadEnv(fullPath(".env"))
+		if err != nil {
+			return nil, err
+		} else {
+			return env, nil
+		}
 	}
 
+	// Handle multiple environment files
+	env := make(Env)
+	for _, file := range files {
+		tmpEnv, err := ReadEnv(file)
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Merge the file I just read into the env.
+		for k, v := range tmpEnv {
+			env[k] = v
+		}
+	}
+	return env, nil
+}
+
+func runStart(cmd *Command, args []string) {
 	pf, err := ReadProcfile(flagProcfile)
 	handleError(err)
 
-	env, err := ReadEnv(flagEnv)
+	concurrency, err := parseConcurrency(flagConcurrency)
 	handleError(err)
 
-	concurrency, err := parseConcurrency(flagConcurrency)
+	env, err := parseEnvironment(envs)
 	handleError(err)
 
 	of := NewOutletFactory()
