@@ -4,12 +4,29 @@ import (
 	"fmt"
 	"github.com/subosito/gotenv"
 	"os"
+	"path/filepath"
 	"regexp"
 )
 
 var envEntryRegexp = regexp.MustCompile("^([A-Za-z_0-9]+)=(.*)$")
 
 type Env map[string]string
+
+type envFiles []string
+
+func (e *envFiles) String() string {
+	return fmt.Sprintf("%s", *e)
+}
+
+func (e *envFiles) Set(value string) error {
+	*e = append(*e, fullPath(value))
+	return nil
+}
+
+func fullPath(file string) string {
+	root := filepath.Dir(".")
+	return filepath.Join(root, file)
+}
 
 func loadEnvs(files []string) (Env, error) {
 	if len(files) == 0 {

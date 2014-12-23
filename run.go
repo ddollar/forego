@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -19,8 +18,10 @@ Examples:
 `,
 }
 
+var runEnvs envFiles
+
 func init() {
-	cmdRun.Flag.StringVar(&flagEnv, "e", ".env", "env")
+	cmdRun.Flag.Var(&runEnvs, "e", "env")
 }
 
 func runRun(cmd *Command, args []string) {
@@ -32,11 +33,8 @@ func runRun(cmd *Command, args []string) {
 	if err != nil {
 		handleError(err)
 	}
-	if flagEnv == "" {
-		flagEnv = filepath.Join(workDir, ".env")
-	}
 
-	env, err := ReadEnv(flagEnv)
+	env, err := loadEnvs(runEnvs)
 	handleError(err)
 
 	const interactive = true

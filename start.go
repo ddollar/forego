@@ -14,17 +14,6 @@ import (
 
 const shutdownGraceTime = 3 * time.Second
 
-type envFiles []string
-
-func (e *envFiles) String() string {
-	return fmt.Sprintf("%s", *e)
-}
-
-func (e *envFiles) Set(value string) error {
-	*e = append(*e, fullPath(value))
-	return nil
-}
-
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
@@ -189,11 +178,6 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 			}
 		}
 	}()
-}
-
-func fullPath(file string) string {
-	root := filepath.Dir(".")
-	return filepath.Join(root, file)
 }
 
 func runStart(cmd *Command, args []string) {
