@@ -192,35 +192,8 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 }
 
 func fullPath(file string) string {
-	root := filepath.Dir(flagProcfile)
+	root := filepath.Dir(".")
 	return filepath.Join(root, file)
-}
-
-func parseEnvironment(files []string) (Env, error) {
-	if len(files) == 0 {
-		env, err := ReadEnv(fullPath(".env"))
-		if err != nil {
-			return nil, err
-		} else {
-			return env, nil
-		}
-	}
-
-	// Handle multiple environment files
-	env := make(Env)
-	for _, file := range files {
-		tmpEnv, err := ReadEnv(file)
-
-		if err != nil {
-			return nil, err
-		}
-
-		// Merge the file I just read into the env.
-		for k, v := range tmpEnv {
-			env[k] = v
-		}
-	}
-	return env, nil
 }
 
 func runStart(cmd *Command, args []string) {
@@ -230,7 +203,7 @@ func runStart(cmd *Command, args []string) {
 	concurrency, err := parseConcurrency(flagConcurrency)
 	handleError(err)
 
-	env, err := parseEnvironment(envs)
+	env, err := loadEnvs(envs)
 	handleError(err)
 
 	of := NewOutletFactory()
