@@ -13,8 +13,8 @@
 		},
 		{
 			"ImportPath": "github.com/ddollar/dist",
-			"Comment": "v0.2.0",
-			"Rev": "95b3220dbc9bb70c4cbda93b4064655a1ff86a06"
+			"Comment": "v0.2.0-2-gf559761",
+			"Rev": "f559761fd36c52dc90d7d2c0bc537e6d96b0edc5"
 		},
 		{
 			"ImportPath": "github.com/ddollar/go-update",
