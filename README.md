@@ -11,12 +11,7 @@ Foreman in Go.
 
 ##### Precompiled Binaries
 
-* [Linux 32bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-386/forego)
-* [Linux 64bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego)
-* [OS X 32bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-386/forego)
-* [OS X 64bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-amd64/forego)
-* [Windows 32bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-386/forego.exe)
-* [Windows 64bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-amd64/forego.exe)
+Download from [gobuild.io](http://gobuild.io/github.com/ddollar/forego)
 
 ##### Compile from Source
 
