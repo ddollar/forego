@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/ddollar/forego",
-	"GoVersion": "go version go1.1.2 darwin/amd64",
+	"GoVersion": "go1.4",
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.org/kardianos/osext",
@@ -17,12 +17,8 @@
 			"Rev": "95b3220dbc9bb70c4cbda93b4064655a1ff86a06"
 		},
 		{
-			"ImportPath": "github.com/inconshreveable/go-execpath",
-			"Rev": "c77cb29fdea163c01cc1470db0a378527d7ae618"
-		},
-		{
-			"ImportPath": "github.com/inconshreveable/go-update",
-			"Rev": "d5c66a4ba82f241ca9a6e80164f92f8206efa919"
+			"ImportPath": "github.com/ddollar/go-update",
+			"Rev": "4733469d35539f410e0e84552944fa0df7e72c98"
 		},
 		{
 			"ImportPath": "github.com/kr/binarydist",

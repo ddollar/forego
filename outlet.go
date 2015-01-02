@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/daviddengcn/go-colortext"
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/daviddengcn/go-colortext"
 	"io"
 	"os"
 	"sync"

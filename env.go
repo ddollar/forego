@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/subosito/gotenv"
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
 	"os"
 	"path/filepath"
 	"regexp"

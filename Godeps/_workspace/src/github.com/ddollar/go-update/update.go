@@ -29,9 +29,9 @@ download progress,
 package update
 
 import (
+	"github.com/ddollar/forego/Godeps/_workspace/src/bitbucket.org/kardianos/osext"
 	"compress/gzip"
 	"fmt"
-	execpath "github.com/inconshreveable/go-execpath"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -137,7 +137,7 @@ func NewDownload(url string) *Download {
 		HttpClient: new(http.Client),
 		Progress:   make(chan int),
 		Method:     "GET",
-		Url: url,
+		Url:        url,
 	}
 }
 
@@ -377,7 +377,7 @@ func FromFile(filepath string) (err error, errRecover error) {
 // in order to not mask the error that caused the rename recovery attempt.
 func FromStream(newBinary io.Reader) (err error, errRecover error) {
 	// get the path to the executable
-	thisExecPath, err := execpath.Get()
+	thisExecPath, err := osext.Executable()
 	if err != nil {
 		return
 	}
@@ -399,8 +399,15 @@ func FromStream(newBinary io.Reader) (err error, errRecover error) {
 	// because the file will still be "in use"
 	fp.Close()
 
-	// move the existing executable to a new file in the same directory
+	// this is where we'll move the executable to so that we can swap in the updated replacement
 	oldExecPath := filepath.Join(execDir, fmt.Sprintf(".%s.old", execName))
+
+	// delete any existing old exec file - this is necessary on Windows for two reasons:
+	// 1. after a successful update, windows can't remove the .old file because the process is still running
+	// 2. windows rename operations fail if the destination file already exists
+	_ = os.Remove(oldExecPath)
+
+	// move the existing executable to a new file in the same directory
 	err = os.Rename(thisExecPath, oldExecPath)
 	if err != nil {
 		return
@@ -426,7 +433,7 @@ func FromStream(newBinary io.Reader) (err error, errRecover error) {
 // applied later.
 func SanityCheck() (err error) {
 	// get the path to the executable
-	thisExecPath, err := execpath.Get()
+	thisExecPath, err := osext.Executable()
 	if err != nil {
 		return
 	}
@@ -441,8 +448,8 @@ func SanityCheck() (err error) {
 	if err != nil {
 		return
 	}
-	defer fp.Close()
+	fp.Close()
 
-	os.Remove(newExecPath)
+	_ = os.Remove(newExecPath)
 	return
 }

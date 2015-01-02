@@ -3,7 +3,7 @@ package gotenv_test
 import (
 	"strings"
 	"fmt"
-	"github.com/subosito/gotenv"
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
 )
 
 func ExampleParse() {
