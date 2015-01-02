@@ -13,7 +13,7 @@ Foreman in Go.
 
 * Linux
   [386](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-386/forego)
-  [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
+  [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego)
 * OS X
   [386](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-386/forego)
   [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-amd64/forego)
