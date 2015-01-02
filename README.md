@@ -12,14 +12,14 @@ Foreman in Go.
 ##### Precompiled Binaries
 
 * Linux
-  [386](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-386/forego)
-  [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego)
+  [32-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-32-bit/forego)
+  [64-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-64-bit/forego)
 * OS X
-  [386](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-386/forego)
-  [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-amd64/forego)
+  [32-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-32-bit/forego)
+  [64-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-64-bit/forego)
 * Windows
-  [386](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-386/forego.exe)
-  [amd64](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-amd64/forego.exe)
+  [32-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-32-bit/forego.exe)
+  [64-bit](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-64-bit/forego.exe)
 
 ##### Compile from Source
 
