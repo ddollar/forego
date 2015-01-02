@@ -11,7 +11,7 @@ Foreman in Go.
 
 ##### Precompiled Binaries
 
-Download from [gobuild.io](http://gobuild.io/github.com/ddollar/forego)
+> Download from [gobuild.io](http://gobuild.io/github.com/ddollar/forego)
 
 ##### Compile from Source
 
