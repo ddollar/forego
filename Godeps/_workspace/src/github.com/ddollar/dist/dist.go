@@ -2,7 +2,7 @@
 package dist
 
 import (
-	"bitbucket.org/kardianos/osext"
+	"github.com/ddollar/forego/Godeps/_workspace/src/bitbucket.org/kardianos/osext"
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
@@ -10,8 +10,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/ddollar/go-update"
-	"github.com/kr/binarydist"
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/ddollar/go-update"
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/kr/binarydist"
 	"io/ioutil"
 	"net/http"
 	"os"
