@@ -104,6 +104,8 @@ func basePort(env Env) (int, error) {
 		return flagPort, nil
 	} else if env["PORT"] != "" {
 		return strconv.Atoi(env["PORT"])
+	} else if os.Getenv("PORT") != "" {
+		return strconv.Atoi(os.Getenv("PORT"))
 	}
 	return defaultPort, nil
 }
