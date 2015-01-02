@@ -17,6 +17,7 @@ const shutdownGraceTime = 3 * time.Second
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
+var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -35,7 +36,7 @@ Examples:
 
 func init() {
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
-	cmdStart.Flag.StringVar(&flagEnv, "e", "", "env")
+	cmdStart.Flag.Var(&envs, "e", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", 5000, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
@@ -180,19 +181,13 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 }
 
 func runStart(cmd *Command, args []string) {
-	root := filepath.Dir(flagProcfile)
-
-	if flagEnv == "" {
-		flagEnv = filepath.Join(root, ".env")
-	}
-
 	pf, err := ReadProcfile(flagProcfile)
 	handleError(err)
 
-	env, err := ReadEnv(flagEnv)
+	concurrency, err := parseConcurrency(flagConcurrency)
 	handleError(err)
 
-	concurrency, err := parseConcurrency(flagConcurrency)
+	env, err := loadEnvs(envs)
 	handleError(err)
 
 	of := NewOutletFactory()
