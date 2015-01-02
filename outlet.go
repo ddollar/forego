@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/daviddengcn/go-colortext"
 	"io"
 	"os"
 	"sync"
-	"bytes"
 )
 
 type OutletFactory struct {

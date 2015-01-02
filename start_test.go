@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestParseConcurrencyFlagEmpty(t *testing.T) {
 	c, err := parseConcurrency("")
@@ -115,6 +118,15 @@ func TestPortFromEnv(t *testing.T) {
 	}
 	if port != 5000 {
 		t.Fatal("Base port should be 5000")
+	}
+
+	os.Setenv("PORT", "4000")
+	port, err = basePort(env)
+	if err != nil {
+		t.Fatal("Can not get port: %s", err)
+	}
+	if port != 4000 {
+		t.Fatal("Base port should be 4000")
 	}
 
 	env["PORT"] = "6000"
