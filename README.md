@@ -5,7 +5,7 @@ Foreman in Go.
 
 ### Installation
 
-##### OSX Homebrew
+##### OS X (Homebrew)
 
     brew install forego
 
