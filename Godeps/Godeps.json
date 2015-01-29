@@ -8,6 +8,21 @@
 			"Rev": "84d8cbacbe137d1c00cdc0762b3ad585a4d64418"
 		},
 		{
+			"ImportPath": "github.com/coreos/etcd/etcdserver/etcdhttp/httptypes",
+			"Comment": "v2.0.0-7-gdb15d39",
+			"Rev": "db15d39e0f87e407570aaec241ed416407cc4d04"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.0.0-7-gdb15d39",
+			"Rev": "db15d39e0f87e407570aaec241ed416407cc4d04"
+		},
+		{
+			"ImportPath": "github.com/coreos/go-etcd/etcd",
+			"Comment": "v0.2.0-rc1-132-gb7c233e",
+			"Rev": "b7c233e2ef9be1016c63f66145161b317165ad7e"
+		},
+		{
 			"ImportPath": "github.com/daviddengcn/go-colortext",
 			"Rev": "8386cd264821f95e9bc124a0a339560d1a899cad"
 		},

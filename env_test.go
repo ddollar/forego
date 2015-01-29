@@ -4,7 +4,7 @@ import "testing"
 
 func TestMultipleEnvironmentFiles(t *testing.T) {
 	envs := []string{"fixtures/envs/.env1", "fixtures/envs/.env2"}
-	env, err := loadEnvs(envs)
+	env, err := loadEnvs(envs, "", "")
 
 	if err != nil {
 		t.Fatalf("Could not read environments: %s", err)
