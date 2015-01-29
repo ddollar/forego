@@ -34,7 +34,7 @@ func runRun(cmd *Command, args []string) {
 		handleError(err)
 	}
 
-	env, err := loadEnvs(runEnvs)
+	env, err := loadEnvs(runEnvs, "", "")
 	handleError(err)
 
 	const interactive = true

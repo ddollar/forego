@@ -16,13 +16,15 @@ const shutdownGraceTime = 3 * time.Second
 const defaultPort = 5000
 
 var flagPort int
+var flagEtcdHost string
+var flagEtcdKey string
 var flagConcurrency string
 var flagRestart bool
 var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-r]",
+	Usage: "start [process name] [-f procfile] [-e env] [-h etcd-host] [-k etcd-key] [-c concurrency] [-p port] [-r]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
@@ -32,6 +34,7 @@ Examples:
   forego start
   forego start web
   forego start -f Procfile.test -e .env.test
+  forego start -h http://127.0.0.1:4001 -k myapp
 `,
 }
 
@@ -39,6 +42,8 @@ func init() {
 	cmdStart.Flag.StringVar(&flagProcfile, "f", "Procfile", "procfile")
 	cmdStart.Flag.Var(&envs, "e", "env")
 	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
+	cmdStart.Flag.StringVar(&flagEtcdHost, "h", "", "etcd-host")
+	cmdStart.Flag.StringVar(&flagEtcdKey, "k", "", "etcd-key")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
 }
@@ -204,7 +209,7 @@ func runStart(cmd *Command, args []string) {
 	concurrency, err := parseConcurrency(flagConcurrency)
 	handleError(err)
 
-	env, err := loadEnvs(envs)
+	env, err := loadEnvs(envs, flagEtcdHost, flagEtcdKey)
 	handleError(err)
 
 	of := NewOutletFactory()
