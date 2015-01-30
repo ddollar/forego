@@ -2,7 +2,7 @@ package pretty
 
 import (
 	"fmt"
-	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/kr/text"
+	"github.com/kr/text"
 	"io"
 	"reflect"
 	"strconv"
