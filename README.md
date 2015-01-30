@@ -1,5 +1,10 @@
 ## forego
-[![Build Status](https://travis-ci.org/ddollar/forego.svg?branch=master)](https://travis-ci.org/ddollar/forego)
+
+<div style="float:right">
+  <a href="https://travis-ci.org/ddollar/forego">
+    <img src="https://travis-ci.org/ddollar/forego.svg?branch=master">
+  </a>
+</div>
 
 Foreman in Go.
 
@@ -28,3 +33,7 @@ Foreman in Go.
     $ forego start
     web    | listening on port 5000
     worker | listening to queue FOO
+
+### License
+
+Apache 2.0 &copy; 2015 David Dollar
