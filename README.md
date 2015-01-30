@@ -1,10 +1,8 @@
 ## forego
 
-<div style="float:right">
-  <a href="https://travis-ci.org/ddollar/forego">
-    <img src="https://travis-ci.org/ddollar/forego.svg?branch=master">
-  </a>
-</div>
+<a href="https://travis-ci.org/ddollar/forego">
+  <img align="right" src="https://travis-ci.org/ddollar/forego.svg?branch=master">
+</a>
 
 Foreman in Go.
 
