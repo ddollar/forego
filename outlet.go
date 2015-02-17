@@ -40,20 +40,25 @@ func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, 
 
 	for {
 		buf := make([]byte, 1024)
-		v, _ := reader.Read(buf)
-
-		if v == 0 {
+		
+		if n, err := reader.Read(buf); err != nil {
 			return
+		} else {
+			buf = buf[:n]
 		}
 
-		idx := bytes.IndexByte(buf, '\n')
-		if idx >= 0 {
-			buffer.Write(buf[0:idx])
+		for {
+			i := bytes.IndexByte(buf, '\n')
+			if i < 0 {
+				break
+			}
+			buffer.Write(buf[0:i])
 			of.WriteLine(name, buffer.String(), color, ct.None, isError)
 			buffer.Reset()
-		} else {
-			buffer.Write(buf)
+			buf = buf[i+1:]
 		}
+
+		buffer.Write(buf)
 	}
 }
 
