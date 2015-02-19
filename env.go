@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
 	"os"
-	"path/filepath"
 	"regexp"
+
+	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
 )
 
 var envEntryRegexp = regexp.MustCompile("^([A-Za-z_0-9]+)=(.*)$")
@@ -19,27 +19,17 @@ func (e *envFiles) String() string {
 }
 
 func (e *envFiles) Set(value string) error {
-	*e = append(*e, fullPath(value))
+	*e = append(*e, value)
 	return nil
-}
-
-func fullPath(file string) string {
-	root := filepath.Dir(".")
-	return filepath.Join(root, file)
 }
 
 func loadEnvs(files []string) (Env, error) {
 	if len(files) == 0 {
-		env, err := ReadEnv(fullPath(".env"))
-		if err != nil {
-			return nil, err
-		} else {
-			return env, nil
-		}
+		files = []string{".env"}
 	}
 
-	// Handle multiple environment files
 	env := make(Env)
+
 	for _, file := range files {
 		tmpEnv, err := ReadEnv(file)
 
