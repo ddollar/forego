@@ -241,7 +241,8 @@ func runStart(cmd *Command, args []string) {
 		}
 	}
 
-	for idx, proc := range pf.Entries {
+	idx := 0
+	for _, proc := range pf.Entries {
 		numProcs := defaultConcurrency
 		if value, ok := concurrency[proc.Name]; ok {
 			numProcs = value
@@ -249,6 +250,7 @@ func runStart(cmd *Command, args []string) {
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
 				f.startProcess(idx, i, proc, env, of)
+				idx++
 			}
 		}
 	}
