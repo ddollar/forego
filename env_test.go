@@ -18,3 +18,19 @@ func TestMultipleEnvironmentFiles(t *testing.T) {
 		t.Fatalf("$env2 should be present and is not")
 	}
 }
+
+func TestDeepCopy(t *testing.T) {
+	envs := []string{"fixtures/envs/.env1", "fixtures/envs/.env2"}
+	env, err := loadEnvs(envs)
+
+	if err != nil {
+		t.Fatalf("Could not read environments: %s", err)
+	}
+
+	copied := env.DeepCopy()
+	copied["env1"] = "busted"
+
+	if env["env1"] == "busted" {
+		t.Fatalf("Environment hasn't been deep-copied")
+	}
+}

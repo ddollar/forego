@@ -1,0 +1,4 @@
+sidekiq: ./checkport 5000 $PORT
+web: ./checkport ${SINGLE:-5100} $PORT
+clock: ./checkport 5200 $PORT
+worker: ./checkport 5300 $PORT

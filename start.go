@@ -116,7 +116,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		panic(err)
 	}
 
-	port = port + (idx * 100)
+	port = port + (idx * 100) + procNum
 
 	const interactive = false
 	workDir := filepath.Dir(flagProcfile)

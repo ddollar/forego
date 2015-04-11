@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+$stdout.sync = true
+
+check, allocated = ARGV[0..1]
+range_start = allocated.to_i - (allocated.to_i % 100)
+
+puts "Received port #{allocated}"
+sleep(1)
+
+if range_start != check.to_i
+  fail "Port #{allocated} not within the proper range. Received #{range_start}, expected #{check}"
+end
