@@ -247,11 +247,17 @@ func runStart(cmd *Command, args []string) {
 		if value, ok := concurrency[proc.Name]; ok {
 			numProcs = value
 		}
+
+		incBasePort := false
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
 				f.startProcess(idx, i, proc, env, of)
-				idx++
+				incBasePort = true
 			}
+		}
+
+		if incBasePort {
+			idx++
 		}
 	}
 
