@@ -41,6 +41,25 @@ func init() {
 	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
+	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency)
+	handleError(err)
+}
+
+func readConfigFile(config_path string, flagProcfile *string, flagPort *int, flagConcurrency *string) error {
+	config, err := ReadConfig(config_path)
+
+	if config["procfile"] != "" {
+		*flagProcfile = config["procfile"]
+	} else {
+		*flagProcfile = "Procfile"
+	}
+	if config["port"] != "" {
+		*flagPort, err = strconv.Atoi(config["port"])
+	} else {
+		*flagPort = defaultPort
+	}
+	*flagConcurrency = config["concurrency"]
+	return err
 }
 
 func parseConcurrency(value string) (map[string]int, error) {
