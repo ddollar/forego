@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -81,15 +82,16 @@ type Forego struct {
 
 func (f *Forego) monitorInterrupt() {
 	handler := make(chan os.Signal, 1)
-	signal.Notify(handler, os.Interrupt)
+	signal.Notify(handler, syscall.SIGALRM, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 
 	first := true
 
 	for sig := range handler {
 		switch sig {
-		case os.Interrupt:
+		case syscall.SIGINT:
 			fmt.Println("      | ctrl-c detected")
-
+			fallthrough
+		default:
 			f.teardown.Fall()
 			if !first {
 				f.teardownNow.Fall()
