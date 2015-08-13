@@ -235,9 +235,11 @@ func runStart(cmd *Command, args []string) {
 
 	defaultConcurrency := 1
 
+	var all bool
 	for name, num := range concurrency {
 		if name == "all" {
 			defaultConcurrency = num
+			all = true
 		}
 	}
 
@@ -246,7 +248,7 @@ func runStart(cmd *Command, args []string) {
 		if len(concurrency) > 0 {
 			if value, ok := concurrency[proc.Name]; ok {
 				numProcs = value
-			} else {
+			} else if !all {
 				continue
 			}
 		}
