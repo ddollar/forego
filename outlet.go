@@ -76,17 +76,21 @@ func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, i
 	of.Lock()
 	defer of.Unlock()
 
-	ct.ChangeColor(leftC, true, ct.None, false)
+	if !flagNoColor {
+		ct.ChangeColor(leftC, true, ct.None, false)
+	}
 	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
 	fmt.Printf(formatter, left)
 
-	if isError {
-		ct.ChangeColor(ct.Red, true, ct.None, true)
-	} else {
-		ct.ResetColor()
+	if !flagNoColor {
+		if isError {
+			ct.ChangeColor(ct.Red, true, ct.None, true)
+		} else {
+			ct.ResetColor()
+		}
 	}
 	fmt.Println(right)
-	if isError {
+	if isError && !flagNoColor {
 		ct.ResetColor()
 	}
 }
