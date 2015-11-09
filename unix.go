@@ -16,7 +16,7 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 		shellArgument = "-ic"
 	}
 	profile := filepath.Join(root, ".profile")
-	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; %s", profile, command)
+	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; exec %s", profile, command)
 	return []string{"bash", shellArgument, shellCommand}
 
 }
