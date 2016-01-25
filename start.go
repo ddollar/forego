@@ -172,6 +172,11 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 			if flagRestart {
 				f.startProcess(idx, procNum, proc, env, of)
 				return
+			} else {
+				stderr, err = ps.StderrPipe()
+				if err != nil {
+					os.Exit(1) // ?
+				}
 			}
 
 		case <-f.teardown.Barrier():
