@@ -174,7 +174,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 				return
 			} else {
 				stderr, err = ps.StderrPipe()
-				if err != nil {
+				if !ps.ProcessState.Success() {
 					os.Exit(1) // ?
 				}
 			}
