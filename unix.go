@@ -17,7 +17,7 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 	}
 	profile := filepath.Join(root, ".profile")
 	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; %s", profile, command)
-	return []string{"/bin/bash", shellArgument, shellCommand}
+	return []string{"bash", shellArgument, shellCommand}
 
 }
 
