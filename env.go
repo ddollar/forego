@@ -5,7 +5,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
+	"github.com/subosito/gotenv"
 )
 
 var envEntryRegexp = regexp.MustCompile("^([A-Za-z_0-9]+)=(.*)$")

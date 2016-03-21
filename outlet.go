@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/daviddengcn/go-colortext"
+	"github.com/daviddengcn/go-colortext"
 	"io"
 	"os"
 	"sync"
@@ -40,7 +40,7 @@ func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, 
 
 	for {
 		buf := make([]byte, 1024)
-		
+
 		if n, err := reader.Read(buf); err != nil {
 			return
 		} else {
