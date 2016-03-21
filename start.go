@@ -173,7 +173,6 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		case <-finished:
 			if flagRestart {
 				f.startProcess(idx, procNum, proc, env, of)
-				return
 			}
 
 		case <-f.teardown.Barrier():
