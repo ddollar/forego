@@ -163,9 +163,6 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 	go func() {
 		defer f.wg.Done()
 
-		// Prevent goroutine from exiting before process has finished.
-		defer func() { <-finished }()
-
 		select {
 		case <-finished:
 			if flagRestart {
@@ -176,6 +173,9 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 		case <-f.teardown.Barrier():
 			// Forego tearing down
+
+			// Prevent goroutine from exiting before process has finished.
+			defer func() { <-finished }()
 
 			if !osHaveSigTerm {
 				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
