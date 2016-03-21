@@ -174,9 +174,6 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		case <-f.teardown.Barrier():
 			// Forego tearing down
 
-			// Prevent goroutine from exiting before process has finished.
-			defer func() { <-finished }()
-
 			if !osHaveSigTerm {
 				of.SystemOutput(fmt.Sprintf("Killing %s", procName))
 				ps.Process.Kill()
