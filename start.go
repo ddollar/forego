@@ -165,7 +165,9 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 
 		// Prevent goroutine from exiting before process has finished.
 		defer func() { <-finished }()
-		defer f.teardown.Fall()
+		if !flagRestart {
+			defer f.teardown.Fall()
+		}
 
 		select {
 		case <-finished:
