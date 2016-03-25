@@ -17,7 +17,7 @@ type Process struct {
 func NewProcess(workdir, command string, env Env, interactive bool) (p *Process) {
 	argv := ShellInvocationCommand(interactive, workdir, command)
 	return &Process{
-		command, env, interactive, exec.Command(argv[0], argv[1:]...),
+		command, env.DeepCopy(), interactive, exec.Command(argv[0], argv[1:]...),
 	}
 }
 

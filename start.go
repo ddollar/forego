@@ -116,7 +116,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		panic(err)
 	}
 
-	port = port + (idx * 100)
+	port = port + (idx * 100) + procNum
 
 	const interactive = false
 	workDir := filepath.Dir(flagProcfile)
@@ -174,6 +174,10 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 			if flagRestart {
 				f.startProcess(idx, procNum, proc, env, of)
 				return
+			} else {
+				if !ps.ProcessState.Success() {
+					os.Exit(1) // ?
+				}
 			}
 
 		case <-f.teardown.Barrier():
@@ -243,15 +247,23 @@ func runStart(cmd *Command, args []string) {
 		}
 	}
 
-	for idx, proc := range pf.Entries {
+	idx := 0
+	for _, proc := range pf.Entries {
 		numProcs := defaultConcurrency
 		if value, ok := concurrency[proc.Name]; ok {
 			numProcs = value
 		}
+
+		incBasePort := false
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
 				f.startProcess(idx, i, proc, env, of)
+				incBasePort = true
 			}
+		}
+
+		if incBasePort {
+			idx++
 		}
 	}
 

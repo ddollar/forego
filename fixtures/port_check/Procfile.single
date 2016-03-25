@@ -1,0 +1,4 @@
+sidekiq: ignore
+web: ./checkport 5000 $PORT
+clock: ignore
+worker: ignore

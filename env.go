@@ -70,3 +70,12 @@ func (e *Env) asArray() (env []string) {
 	}
 	return
 }
+
+func (e *Env) DeepCopy() Env {
+	out := make(Env)
+	for k, v := range *e {
+		out[k] = v
+	}
+
+	return out
+}
