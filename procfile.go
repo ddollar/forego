@@ -10,7 +10,7 @@ import (
 	"regexp"
 )
 
-var procfileEntryRegexp = regexp.MustCompile("^([A-Za-z0-9_]+):\\s*(.+)$")
+var procfileEntryRegexp = regexp.MustCompile("^([A-Za-z0-9_-]+):\\s*(.+)$")
 
 type ProcfileEntry struct {
 	Name    string
