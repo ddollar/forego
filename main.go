@@ -5,7 +5,7 @@ import "os"
 var commands = []*Command{
 	cmdStart,
 	cmdRun,
-	cmdUpdate,
+	// cmdUpdate,
 	cmdVersion,
 	cmdHelp,
 }
