@@ -8,7 +8,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/daviddengcn/go-colortext",
-			"Rev": "ffa9244bab877bf3480871b4765f189c1d36ce20"
+			"Rev": "3b18c8575a432453d41fdafb340099fff5bba2f7"
 		},
 		{
 			"ImportPath": "github.com/subosito/gotenv",
