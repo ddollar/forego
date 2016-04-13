@@ -232,16 +232,22 @@ func runStart(cmd *Command, args []string) {
 
 	defaultConcurrency := 1
 
+	var all bool
 	for name, num := range concurrency {
 		if name == "all" {
 			defaultConcurrency = num
+			all = true
 		}
 	}
 
 	for idx, proc := range pf.Entries {
 		numProcs := defaultConcurrency
-		if value, ok := concurrency[proc.Name]; ok {
-			numProcs = value
+		if len(concurrency) > 0 {
+			if value, ok := concurrency[proc.Name]; ok {
+				numProcs = value
+			} else if !all {
+				continue
+			}
 		}
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
