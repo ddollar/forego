@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	_ "github.com/kr/pretty"
 	"io"
 	"math"
 	"os"

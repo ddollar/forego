@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/daviddengcn/go-colortext"
 	"io"
 	"os"
 	"sync"
