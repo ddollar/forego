@@ -1,7 +1,7 @@
 BIN = forego
 SRC = $(shell ls *.go)
 
-.PHONY: all build clean install test lint
+.PHONY: all build clean install lint release test
 
 all: build
 
@@ -16,8 +16,12 @@ install: forego
 lint: $(SRC)
 	go fmt
 
+release:
+	curl -s https://bin.equinox.io/a/gSD5wcgebYp/release-tool-1.8.7-linux-amd64.tar.gz | sudo tar xz -C /usr/local/bin
+	equinox release --version=$(date +%s) --channel=stable --signing-key=<(echo $EQUINOX_SIGNING_KEY) --app=$EQUINOX_APP --token=$EQUINOX_TOKEN
+
 test: lint build
-	go test ./... -cover
+	go test -v -race -cover ./...
 
 $(BIN): $(SRC)
 	go build -o $@
