@@ -18,7 +18,6 @@ lint: $(SRC)
 
 test: lint build
 	go test ./... -cover
-	cd eg && ../forego start
 
 $(BIN): $(SRC)
 	go build -o $@
