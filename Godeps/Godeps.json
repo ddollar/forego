@@ -1,38 +1,14 @@
 {
 	"ImportPath": "github.com/ddollar/forego",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v60",
+	"GodepVersion": "v61",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
-			"ImportPath": "bitbucket.org/kardianos/osext",
-			"Comment": "null-13",
-			"Rev": "5d3ddcf53a508cc2f7404eaebf546ef2cb5cdb6e"
-		},
-		{
 			"ImportPath": "github.com/daviddengcn/go-colortext",
-			"Rev": "8386cd264821f95e9bc124a0a339560d1a899cad"
-		},
-		{
-			"ImportPath": "github.com/ddollar/dist",
-			"Comment": "v0.2.0-2-gf559761",
-			"Rev": "f559761fd36c52dc90d7d2c0bc537e6d96b0edc5"
-		},
-		{
-			"ImportPath": "github.com/ddollar/go-update",
-			"Rev": "4733469d35539f410e0e84552944fa0df7e72c98"
-		},
-		{
-			"ImportPath": "github.com/kr/binarydist",
-			"Rev": "9955b0ab8708602d411341e55fffd7e0700f86bd"
-		},
-		{
-			"ImportPath": "github.com/kr/pretty",
-			"Comment": "go.weekly.2011-12-22-18-gbc9499c",
-			"Rev": "bc9499caa0f45ee5edb2f0209fbd61fbf3d9018f"
-		},
-		{
-			"ImportPath": "github.com/kr/text",
-			"Rev": "6807e777504f54ad073ecef66747de158294b639"
+			"Rev": "ffa9244bab877bf3480871b4765f189c1d36ce20"
 		},
 		{
 			"ImportPath": "github.com/subosito/gotenv",
