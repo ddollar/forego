@@ -1,22 +1,18 @@
 ## forego
 
-<a href="https://travis-ci.org/ddollar/forego">
-  <img align="right" src="https://travis-ci.org/ddollar/forego.svg?branch=master">
+<a href="https://circleci.com/gh/ddollar/forego">
+  <img align="right" src="https://circleci.com/gh/ddollar/forego.svg?style=svg">
 </a>
 
 Foreman in Go.
 
 ### Installation
 
-##### OS X (Homebrew)
+##### Downloads
 
-    brew install forego
+Forego uses [Equinox](https://equinox.io) to automatically build binaries for various platforms.
 
-##### Precompiled Binaries
-
-* [Linux](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego)
-* [OSX](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/darwin-amd64/forego)
-* [Windows](https://godist.herokuapp.com/projects/ddollar/forego/releases/current/windows-amd64/forego.exe)
+See the [downloads page](https://dl.equinox.io/convox/forego/stable).
 
 ##### Compile from Source
 
