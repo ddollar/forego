@@ -1,0 +1,9 @@
+test:
+  override:
+    - make test
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - make release

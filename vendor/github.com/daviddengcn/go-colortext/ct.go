@@ -35,3 +35,13 @@ func ResetColor() {
 func ChangeColor(fg Color, fgBright bool, bg Color, bgBright bool) {
 	changeColor(fg, fgBright, bg, bgBright)
 }
+
+// Foreground changes the foreground color.
+func Foreground(cl Color, bright bool) {
+	ChangeColor(cl, bright, None, false)
+}
+
+// Background changes the background color.
+func Background(cl Color, bright bool) {
+	ChangeColor(None, false, cl, bright)
+}

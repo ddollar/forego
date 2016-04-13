@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/daviddengcn/go-colortext"
 	"io"
 	"os"
 	"sync"
+
+	ct "github.com/daviddengcn/go-colortext"
 )
 
 type OutletFactory struct {

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/ddollar/forego/Godeps/_workspace/src/github.com/subosito/gotenv"
 	"os"
+
+	"github.com/subosito/gotenv"
 )
 
 type Config map[string]string
