@@ -8,11 +8,7 @@ Foreman in Go.
 
 ### Installation
 
-##### Downloads
-
-Forego uses [Equinox](https://equinox.io) to automatically build binaries for various platforms.
-
-See the [downloads page](https://dl.equinox.io/convox/forego/stable).
+[Downloads](https://dl.equinox.io/convox/forego/stable)
 
 ##### Compile from Source
 
