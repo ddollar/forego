@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	_ "github.com/ddollar/forego/Godeps/_workspace/src/github.com/kr/pretty"
+	_ "github.com/kr/pretty"
 	"io"
 	"math"
 	"os"

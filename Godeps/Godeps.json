@@ -1,9 +1,7 @@
 {
 	"ImportPath": "github.com/ddollar/forego",
-	"GoVersion": "go1.4.1",
-	"Packages": [
-		"."
-	],
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.org/kardianos/osext",
@@ -16,8 +14,8 @@
 		},
 		{
 			"ImportPath": "github.com/ddollar/dist",
-			"Comment": "v0.2.0-3-gd4be91e",
-			"Rev": "d4be91e0cd1771c51ae117e18eb6c379757623f4"
+			"Comment": "v0.2.0-2-gf559761",
+			"Rev": "f559761fd36c52dc90d7d2c0bc537e6d96b0edc5"
 		},
 		{
 			"ImportPath": "github.com/ddollar/go-update",

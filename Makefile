@@ -21,4 +21,4 @@ test: lint build
 	cd eg && ../forego start
 
 $(BIN): $(SRC)
-	godep go build -o $@
+	go build -o $@
