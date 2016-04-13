@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"sync"
+
+	ct "github.com/daviddengcn/go-colortext"
 )
 
 type OutletFactory struct {
