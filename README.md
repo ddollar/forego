@@ -8,7 +8,7 @@ Foreman in Go.
 
 ### Installation
 
-[Downloads](https://dl.equinox.io/convox/forego/stable)
+[Downloads](https://dl.equinox.io/ddollar/forego/stable)
 
 ##### Compile from Source
 
