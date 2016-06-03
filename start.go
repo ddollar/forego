@@ -13,17 +13,18 @@ import (
 	"time"
 )
 
-const shutdownGraceTime = 3 * time.Second
 const defaultPort = 5000
+const defaultShutdownGraceTime = 3
 
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
+var flagShutdownGraceTime int
 var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-r]",
+	Usage: "start [process name] [-f procfile] [-e env] [-c concurrency] [-p port] [-t timeout] [-r]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile (defaults to ./Procfile)
@@ -33,6 +34,7 @@ Examples:
   forego start
   forego start web
   forego start -f Procfile.test -e .env.test
+  forego start -t 30
 `,
 }
 
@@ -42,11 +44,12 @@ func init() {
 	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
-	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency)
+	cmdStart.Flag.IntVar(&flagShutdownGraceTime, "t", defaultShutdownGraceTime, "shutdown grace time")
+	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency, &flagShutdownGraceTime)
 	handleError(err)
 }
 
-func readConfigFile(config_path string, flagProcfile *string, flagPort *int, flagConcurrency *string) error {
+func readConfigFile(config_path string, flagProcfile *string, flagPort *int, flagConcurrency *string, flagShutdownGraceTime *int) error {
 	config, err := ReadConfig(config_path)
 
 	if config["procfile"] != "" {
@@ -58,6 +61,11 @@ func readConfigFile(config_path string, flagProcfile *string, flagPort *int, fla
 		*flagPort, err = strconv.Atoi(config["port"])
 	} else {
 		*flagPort = defaultPort
+	}
+	if config["shutdown_grace_time"] != "" {
+		*flagShutdownGraceTime, err = strconv.Atoi(config["shutdown_grace_time"])
+	} else {
+		*flagShutdownGraceTime = defaultShutdownGraceTime
 	}
 	*flagConcurrency = config["concurrency"]
 	return err
@@ -237,7 +245,7 @@ func runStart(cmd *Command, args []string) {
 	// When teardown fires, start the grace timer
 	f.teardown.FallHook = func() {
 		go func() {
-			time.Sleep(shutdownGraceTime)
+			time.Sleep(time.Duration(flagShutdownGraceTime) * time.Second)
 			of.SystemOutput("Grace time expired")
 			f.teardownNow.Fall()
 		}()

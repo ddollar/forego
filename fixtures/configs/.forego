@@ -1,3 +1,4 @@
 procfile: Procfile.dev
 concurrency: foo=2,bar=3
 port: 15000
+shutdown_grace_time: 30
