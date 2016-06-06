@@ -150,7 +150,8 @@ func TestConfigBeOverrideByForegoFile(t *testing.T) {
 	var procfile = "Profile"
 	var port = 5000
 	var concurrency string = "web=2"
-	err := readConfigFile("./fixtures/configs/.forego", &procfile, &port, &concurrency)
+	var gracetime int = 3
+	err := readConfigFile("./fixtures/configs/.forego", &procfile, &port, &concurrency, &gracetime)
 
 	if err != nil {
 		t.Fatalf("Cannot set default values from forego config file")
@@ -166,5 +167,9 @@ func TestConfigBeOverrideByForegoFile(t *testing.T) {
 
 	if concurrency != "foo=2,bar=3" {
 		t.Fatal("concurrency should be 'foo=2,bar=3', got %s", concurrency)
+	}
+
+	if gracetime != 30 {
+		t.Fatal("gracetime should be 3, got %d", gracetime)
 	}
 }
