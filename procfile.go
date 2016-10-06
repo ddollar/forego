@@ -47,6 +47,9 @@ func (pf *Procfile) LongestProcessName(concurrency map[string]int) (longest int)
 		if c, ok := concurrency[entry.Name]; ok {
 			// Add the number of digits
 			thisLen += int(math.Log10(float64(c))) + 1
+		} else {
+			// The index number after the dot.
+			thisLen += 1
 		}
 		if thisLen > longest {
 			longest = thisLen
