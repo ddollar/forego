@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 	"syscall"
 )
 
@@ -15,10 +14,8 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 	if interactive {
 		shellArgument = "-ic"
 	}
-	profile := filepath.Join(root, ".profile")
-	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; exec %s", profile, command)
+	shellCommand := fmt.Sprintf("cd \"%s\"; source .profile 2>/dev/null; exec %s", root, command)
 	return []string{"bash", shellArgument, shellCommand}
-
 }
 
 func (p *Process) PlatformSpecificInit() {
