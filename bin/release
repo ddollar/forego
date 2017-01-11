@@ -1,12 +1,12 @@
 #!/bin/sh
 
-version=$(shell date +%Y%m%d%H%M%S)
+version=$(date +%Y%m%d%H%M%S)
 
 mkdir -p ~/.ssh
-curl -s $(GITHUB_KEY_URL) -o ~/.ssh/id_rsa
+curl -s ${GITHUB_KEY_URL} -o ~/.ssh/id_rsa
 chmod 0400 ~/.ssh/id_rsa
 git tag ${version}
 git push origin ${version}
 
-curl -s $(EQUINOX_KEY_URL) -o /tmp/equinox.key
-equinox release --version=${version} --platforms="darwin_386 darwin_amd64 linux_386 linux_amd64 windows_386 windows_amd64" --channel=stable --signing-key=/tmp/equinox.key --app=$(EQUINOX_APP) --token=$(EQUINOX_TOKEN)
+curl -s ${EQUINOX_KEY_URL} -o /tmp/equinox.key
+equinox release --version=${version} --platforms="darwin_386 darwin_amd64 linux_386 linux_amd64 windows_386 windows_amd64" --channel=stable --signing-key=/tmp/equinox.key --app=${EQUINOX_APP} --token=${EQUINOX_TOKEN}
