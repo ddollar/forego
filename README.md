@@ -4,7 +4,7 @@
   <img align="right" src="https://circleci.com/gh/ddollar/forego.svg?style=svg">
 </a>
 
-Foreman in Go.
+[Foreman](https://github.com/ddollar/foreman) in Go.
 
 ### Installation
 
