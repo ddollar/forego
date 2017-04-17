@@ -1,0 +1,11 @@
+author: shengxiang
+description: '...'
+os: darwin linux windows
+includes:
+  - README.md
+  - LICENSE
+excludes:
+  - \.git
+script:
+  - go get -v
+  - go build
