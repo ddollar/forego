@@ -19,12 +19,13 @@ const defaultShutdownGraceTime = 3
 var flagPort int
 var flagConcurrency string
 var flagRestart bool
+var flagNoColor bool
 var flagShutdownGraceTime int
 var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time]",
+	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time] [-n]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile. The directory containing the
@@ -58,6 +59,8 @@ The following options are available:
                being asked to stop. Once this grace time expires, the process is
                forcibly terminated. By default, it is 3 seconds.
 
+  -n				   Do not colorize output.
+
 If there is a file named .forego in the current directory, it will be read in
 the same way as an environment file, and the values of variables procfile, port,
 concurrency, and shutdown_grace_time used to change the corresponding default
@@ -85,6 +88,7 @@ func init() {
 	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
+	cmdStart.Flag.BoolVar(&flagNoColor, "n", false, "suppress color in output")
 	cmdStart.Flag.IntVar(&flagShutdownGraceTime, "t", defaultShutdownGraceTime, "shutdown grace time")
 	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency, &flagShutdownGraceTime)
 	handleError(err)
@@ -276,7 +280,8 @@ func runStart(cmd *Command, args []string) {
 
 	of := NewOutletFactory()
 	of.Padding = pf.LongestProcessName(concurrency)
-
+	of.Color = !flagNoColor
+	
 	f := &Forego{
 		outletFactory: of,
 	}
