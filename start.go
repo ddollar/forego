@@ -180,13 +180,9 @@ func basePort(env Env) (int, error) {
 	return defaultPort, nil
 }
 
-func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
-	port, err := basePort(env)
-	if err != nil {
-		panic(err)
-	}
+func (f *Forego) startProcess(base, idx, procNum int, proc ProcfileEntry, env Env, of *OutletFactory) {
 
-	port = port + (idx * 100)
+	port := base + (idx * 100)
 
 	const interactive = false
 	workDir := filepath.Dir(flagProcfile)
@@ -236,7 +232,7 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		select {
 		case <-finished:
 			if flagRestart {
-				f.startProcess(idx, procNum, proc, env, of)
+				f.startProcess(base, idx, procNum, proc, env, of)
 			} else {
 				f.teardown.Fall()
 			}
@@ -272,6 +268,9 @@ func runStart(cmd *Command, args []string) {
 	handleError(err)
 
 	env, err := loadEnvs(envs)
+	handleError(err)
+
+	base, err := basePort(env)
 	handleError(err)
 
 	of := NewOutletFactory()
@@ -321,7 +320,7 @@ func runStart(cmd *Command, args []string) {
 		}
 		for i := 0; i < numProcs; i++ {
 			if (singleton == "") || (singleton == proc.Name) {
-				f.startProcess(idx, i, proc, env, of)
+				f.startProcess(base, idx, i, proc, env, of)
 			}
 		}
 	}
