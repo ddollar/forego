@@ -8,7 +8,7 @@ jobs:
       # specify the version
       - image: circleci/golang:1.9
 
-    working_directory: /go/src/github.com/nzsmartie/forego
+    working_directory: /go/src/github.com/ddollar/forego
 
     environment:
       TEST_RESULTS: /tmp/test-results
@@ -39,7 +39,7 @@ jobs:
     docker:
       - image: circleci/golang:1.9
 
-    working_directory: /go/src/github.com/nzsmartie/forego
+    working_directory: /go/src/github.com/ddollar/forego
 
     steps:
       - checkout

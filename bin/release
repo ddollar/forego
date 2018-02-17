@@ -9,4 +9,4 @@ GIT_SSH_COMMAND='ssh -i /tmp/github.key' git push origin ${version}
 
 curl -s https://bin.equinox.io/c/mBWdkfai63v/release-tool-stable-linux-amd64.tgz | sudo tar xz -C /usr/local/bin
 curl -s ${EQUINOX_KEY_URL} -o /tmp/equinox.key
-equinox release --version=${version} --platforms="darwin_386 darwin_amd64 darwin_arm darwin_arm64 linux_386 linux_amd64 linux_arm linux_arm64 windows_386 windows_amd64" --channel=stable --signing-key=/tmp/equinox.key --app=${EQUINOX_APP} --token=${EQUINOX_TOKEN}
+equinox release --version=${version} --platforms="darwin_386 darwin_amd64 linux_386 linux_amd64 linux_arm linux_arm64 windows_386 windows_amd64" --channel=stable --signing-key=/tmp/equinox.key --app=${EQUINOX_APP} --token=${EQUINOX_TOKEN}
