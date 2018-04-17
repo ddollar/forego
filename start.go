@@ -24,7 +24,7 @@ var envs envFiles
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time]",
+	Usage: "start [process name...] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile. The directory containing the
@@ -292,37 +292,44 @@ func runStart(cmd *Command, args []string) {
 		}()
 	}
 
-	var singleton string = ""
-	if len(args) > 0 {
-		singleton = args[0]
-		if !pf.HasProcess(singleton) {
-			of.ErrorOutput(fmt.Sprintf("no such process: %s", singleton))
+	for procName := range concurrency {
+		if !pf.HasProcess(procName) {
+			of.ErrorOutput(fmt.Sprintf("no such process: %s", procName))
+		}
+	}
+
+	// unify concurrency and arg approach - if process specified on both,
+	// concurrency specification takes precedence
+	for _, procName := range args {
+		if !pf.HasProcess(procName) {
+			of.ErrorOutput(fmt.Sprintf("no such process: %s", procName))
+		}
+		if _, ok := concurrency[procName]; !ok {
+			concurrency[procName] = 1
 		}
 	}
 
 	defaultConcurrency := 1
 
-	var all bool
+	all := len(concurrency) == 0
 	for name, num := range concurrency {
 		if name == "all" {
-			defaultConcurrency = num
 			all = true
+			defaultConcurrency = num
 		}
 	}
 
 	for idx, proc := range pf.Entries {
 		numProcs := defaultConcurrency
-		if len(concurrency) > 0 {
-			if value, ok := concurrency[proc.Name]; ok {
-				numProcs = value
-			} else if !all {
+		if !all {
+			if n, ok := concurrency[proc.Name]; ok {
+				numProcs = n
+			} else {
 				continue
 			}
 		}
 		for i := 0; i < numProcs; i++ {
-			if (singleton == "") || (singleton == proc.Name) {
-				f.startProcess(idx, i, proc, env, of)
-			}
+			f.startProcess(idx, i, proc, env, of)
 		}
 	}
 
