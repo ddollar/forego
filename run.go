@@ -8,9 +8,10 @@ import (
 var cmdRun = &Command{
 	Run:   runRun,
 	Usage: "run [-e env] [-p port]",
-	Short: "Run a one-off command",
+	Short: "Run a one-off command in forego’s environment",
 	Long: `
-Run a one-off command
+Run a one-off command with environment variables set by forego.
+(By default, PORT=5000 and any defined in './.env'.)
 
 Examples:
 
