@@ -14,8 +14,8 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 	if interactive {
 		shellArgument = "-ic"
 	}
-	shellCommand := fmt.Sprintf("cd \"%s\"; source .profile 2>/dev/null; exec %s", root, command)
-	return []string{"sh", shellArgument, shellCommand}
+	shellCommand := fmt.Sprintf("cd \"%s\"; . ./.profile 2>/dev/null; exec %s", root, command)
+	return []string{"/bin/sh", shellArgument, shellCommand}
 }
 
 func (p *Process) PlatformSpecificInit() {
