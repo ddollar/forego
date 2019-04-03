@@ -31,7 +31,7 @@ var (
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time] [-n]",
+	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time] [-n] [-s status]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile. The directory containing the
