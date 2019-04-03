@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strconv"
@@ -242,8 +243,13 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		err := ps.Wait()
 		if err != nil {
 			f.Lock()
-			if flagExitStatusOnError > 0 {
-				f.status = flagExitStatusOnError
+			if e, ok := err.(*exec.ExitError); ok && !e.ProcessState.Success() {
+				s := e.ProcessState.Sys()
+				if u, ok := s.(syscall.WaitStatus); ok {
+					if !u.Signaled() && flagExitStatusOnError > 0 {
+						f.status = flagExitStatusOnError
+					}
+				}
 			}
 			f.Unlock()
 		}
