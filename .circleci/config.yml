@@ -1,0 +1,61 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.9
+
+    working_directory: /go/src/github.com/ddollar/forego
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
+
+    steps:
+      - checkout
+      - run: go get github.com/daviddengcn/go-colortext
+      - run: go get github.com/subosito/gotenv
+
+      # For capturing test results
+      - run: go get github.com/jstemmer/go-junit-report
+      - run: mkdir -p $TEST_RESULTS
+      
+      # specify any bash command here prefixed with `run: `   
+      - run: 
+          name: Run unit tests
+          command: |
+            trap "go-junit-report <${TEST_RESULTS}/forego-tests.log > ${TEST_RESULTS}/forego-tests-report.xml" EXIT
+            make test | tee ${TEST_RESULTS}/forego-tests.log
+
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: raw-test-output
+        
+      - store_test_results:
+          path: /tmp/test-results
+  release:
+    docker:
+      - image: circleci/golang:1.9
+
+    working_directory: /go/src/github.com/ddollar/forego
+
+    steps:
+      - checkout
+      - run: go get github.com/daviddengcn/go-colortext
+      - run: go get github.com/subosito/gotenv
+
+      - run: make release
+
+workflows:
+  version: 2
+  deployment:
+    jobs:
+      - build
+      - release:
+          requires: 
+          - build
+          filters:
+            branches:
+              only: master

@@ -1,5 +1,5 @@
 BIN = forego
-SRC = $(shell ls *.go)
+SRC = $(shell find . -name '*.go' -not -path './vendor/*')
 
 .PHONY: all build clean lint release test
 
