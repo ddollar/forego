@@ -1,18 +1,28 @@
-## forego
-
-<a href="https://circleci.com/gh/ddollar/forego">
-  <img align="right" src="https://circleci.com/gh/ddollar/forego.svg?style=svg">
-</a>
+## Forego
 
 [Foreman](https://github.com/ddollar/foreman) in Go.
 
-### Installation
+## Installing
 
-[Downloads](https://dl.equinox.io/ddollar/forego/stable)
+For your convenience, Forego can be installed via Homebrew. However you cannot install it along side the original Forego, from which this was forked.
 
-##### Compile from Source
+Install the latest version thusly:
 
-    $ go get -u github.com/ddollar/forego
+```
+$ brew install 'http://bww-artifacts.s3.amazonaws.com/forego/latest/forego.rb'
+```
+
+Upgrade (or uninstall) it as follows:
+
+```
+$ brew upgrade 'http://bww-artifacts.s3.amazonaws.com/forego/latest/forego.rb'
+```
+
+Uninstall as follows:
+
+```
+$ brew uninstall forego
+```
 
 ### Usage
 
@@ -29,4 +39,4 @@ Use `forego help` to get a list of available commands, and `forego help
 
 ### License
 
-Apache 2.0 &copy; 2015 David Dollar
+Apache 2.0 &copy; 2015 David Dollar, 2018 Brian W. Wolter

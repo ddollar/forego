@@ -2,6 +2,11 @@ package main
 
 import "os"
 
+var ( // set at compile time via the linker
+	version = "v0.0.0"
+	githash = "000000"
+)
+
 var commands = []*Command{
 	cmdStart,
 	cmdRun,

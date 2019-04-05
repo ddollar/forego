@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strconv"
@@ -13,18 +14,24 @@ import (
 	"time"
 )
 
-const defaultPort = 5000
-const defaultShutdownGraceTime = 3
+const (
+	defaultPort              = 5000
+	defaultShutdownGraceTime = 3
+)
 
-var flagPort int
-var flagConcurrency string
-var flagRestart bool
-var flagShutdownGraceTime int
-var envs envFiles
+var (
+	flagPort              int
+	flagConcurrency       string
+	flagRestart           bool
+	flagNoColor           bool
+	flagExitStatusOnError int
+	flagShutdownGraceTime int
+	envs                  envFiles
+)
 
 var cmdStart = &Command{
 	Run:   runStart,
-	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time]",
+	Usage: "start [process name] [-f procfile] [-e env] [-p port] [-c concurrency] [-r] [-t shutdown_grace_time] [-n] [-s status]",
 	Short: "Start the application",
 	Long: `
 Start the application specified by a Procfile. The directory containing the
@@ -58,6 +65,11 @@ The following options are available:
                being asked to stop. Once this grace time expires, the process is
                forcibly terminated. By default, it is 3 seconds.
 
+  -n           Do not colorize output.
+  
+  -s status    When non-zero, exit with the provided status when a managed process
+               exits with an error status.
+
 If there is a file named .forego in the current directory, it will be read in
 the same way as an environment file, and the values of variables procfile, port,
 concurrency, and shutdown_grace_time used to change the corresponding default
@@ -85,6 +97,8 @@ func init() {
 	cmdStart.Flag.IntVar(&flagPort, "p", defaultPort, "port")
 	cmdStart.Flag.StringVar(&flagConcurrency, "c", "", "concurrency")
 	cmdStart.Flag.BoolVar(&flagRestart, "r", false, "restart")
+	cmdStart.Flag.BoolVar(&flagNoColor, "n", false, "suppress")
+	cmdStart.Flag.IntVar(&flagExitStatusOnError, "s", 0, "status")
 	cmdStart.Flag.IntVar(&flagShutdownGraceTime, "t", defaultShutdownGraceTime, "shutdown grace time")
 	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency, &flagShutdownGraceTime)
 	handleError(err)
@@ -141,11 +155,11 @@ func parseConcurrency(value string) (map[string]int, error) {
 }
 
 type Forego struct {
-	outletFactory *OutletFactory
-
+	sync.Mutex
+	outletFactory         *OutletFactory
 	teardown, teardownNow Barrier // signal shutting down
-
-	wg sync.WaitGroup
+	wg                    sync.WaitGroup
+	status                int
 }
 
 func (f *Forego) monitorInterrupt() {
@@ -226,7 +240,19 @@ func (f *Forego) startProcess(idx, procNum int, proc ProcfileEntry, env Env, of 
 		defer f.wg.Done()
 		defer close(finished)
 		pipeWait.Wait()
-		ps.Wait()
+		err := ps.Wait()
+		if err != nil {
+			f.Lock()
+			if e, ok := err.(*exec.ExitError); ok && !e.ProcessState.Success() {
+				s := e.ProcessState.Sys()
+				if u, ok := s.(syscall.WaitStatus); ok {
+					if !u.Signaled() && flagExitStatusOnError > 0 {
+						f.status = flagExitStatusOnError
+					}
+				}
+			}
+			f.Unlock()
+		}
 	}()
 
 	f.wg.Add(1)
@@ -276,6 +302,7 @@ func runStart(cmd *Command, args []string) {
 
 	of := NewOutletFactory()
 	of.Padding = pf.LongestProcessName(concurrency)
+	of.Color = !flagNoColor
 
 	f := &Forego{
 		outletFactory: of,
@@ -327,6 +354,10 @@ func runStart(cmd *Command, args []string) {
 	}
 
 	<-f.teardown.Barrier()
-
 	f.wg.Wait()
+
+	// all other routines have completed; no need for locking
+	if f.status > 0 {
+		os.Exit(f.status)
+	}
 }

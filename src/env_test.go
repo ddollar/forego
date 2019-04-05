@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestMultipleEnvironmentFiles(t *testing.T) {
-	envs := []string{"fixtures/envs/.env1", "fixtures/envs/.env2"}
+	envs := []string{"../fixtures/envs/.env1", "../fixtures/envs/.env2"}
 	env, err := loadEnvs(envs)
 
 	if err != nil {
