@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# defaults
+formula_path="./forego.rb"
+
+# arguments
+while [[ $# -gt 1 ]]; do
+  key="$1"
+  case $key in
+      -v|--version)
+        release_version="$2"
+        shift;;
+      -o|--output)
+        formula_path="$2"
+        shift;;
+      *)
+        break;;
+  esac
+  shift # past argument or value
+done
+
+# system
+OS=darwin
+ARCH=amd64
+
+# make sure we have valid state
+if [ -z "$release_version" ]; then
+  echo "No version specified (use: -v <version>)"
+  exit -1
+fi
+
+# archive
+if [ ! -f "$1" ]; then
+  echo "No archive provided"
+  exit -1
+fi
+
+sha256=$(openssl dgst -sha256 "$1")
+sha256=${sha256#* }
+
+cat <<FORMULA> "$formula_path"
+
+class Forego < Formula
+  homepage "https://github.com/bww/forego"
+  url "http://bww-artifacts.s3.amazonaws.com/forego/${release_version}/forego-${release_version}-${OS}-${ARCH}.tgz"
+  sha256 "${sha256}"
+  version "${release_version}"
+  
+  def install
+    bin.install "bin/forego"
+  end
+end
+FORMULA
