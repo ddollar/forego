@@ -91,7 +91,7 @@ func init() {
 	cmdStart.Flag.IntVar(&flagShutdownGraceTime, "t", defaultShutdownGraceTime, "shutdown grace time")
 	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency, &flagShutdownGraceTime)
 	handleError(err)
-	colorize = terminal.IsTerminal(int(os.Stdout.Fd()))
+	colorize = os.Getenv("NO_COLOR") == "" && terminal.IsTerminal(int(os.Stdout.Fd()))
 }
 
 func readConfigFile(config_path string, flagProcfile *string, flagPort *int, flagConcurrency *string, flagShutdownGraceTime *int) error {
