@@ -12,7 +12,7 @@ import (
 )
 
 type OutletFactory struct {
-	Padding int
+	LeftFormatter string
 
 	sync.Mutex
 }
@@ -80,8 +80,7 @@ func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, i
 	if colorize {
 		ct.ChangeColor(leftC, true, ct.None, false)
 	}
-	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
-	fmt.Printf(formatter, left)
+	fmt.Printf(of.LeftFormatter, left)
 
 	if colorize {
 		if isError {

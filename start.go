@@ -279,7 +279,7 @@ func runStart(cmd *Command, args []string) {
 	handleError(err)
 
 	of := NewOutletFactory()
-	of.Padding = pf.LongestProcessName(concurrency)
+	of.LeftFormatter = fmt.Sprintf("%%-%ds | ", pf.LongestProcessName(concurrency))
 
 	f := &Forego{
 		outletFactory: of,
