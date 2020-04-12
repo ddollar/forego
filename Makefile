@@ -1,5 +1,6 @@
 BIN = forego
 SRC = $(shell find . -name '*.go' -not -path './vendor/*')
+VERSION = dev
 
 .PHONY: all build clean lint release test
 
@@ -20,4 +21,4 @@ test: lint build
 	go test -v -race -cover ./...
 
 $(BIN): $(SRC)
-	go build -o $@
+	go build -ldflags "-X main.Version=$(VERSION)" -o $@
