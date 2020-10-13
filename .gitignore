@@ -1,6 +1,5 @@
 .env
 .DS_Store
-/forego
 
 target/
 bin/
