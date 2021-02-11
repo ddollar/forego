@@ -19,9 +19,7 @@ jobs:
           make archive GOOS=darwin GOARCH=amd64
       - name: Setup variables
         id: vars
-        run:
-          - echo "::set-output name=githash::$(git rev-parse --short HEAD)"
-          - echo "::set-output name=message::$(git log -1 --pretty=%B)"
+        run: echo "::set-output name=githash::$(git rev-parse --short HEAD)"
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -30,7 +28,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: ${{ steps.vars.outputs.message }}
           draft: true
           prerelease: false
       - name: Upload artifact
