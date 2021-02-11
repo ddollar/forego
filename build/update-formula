@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+# meta
+product="forego"
 # defaults
-formula_path="./forego.rb"
+formula_path="./${product}.rb"
 
 # arguments
 while [[ $# -gt 1 ]]; do
@@ -41,13 +43,13 @@ sha256=${sha256#* }
 cat <<FORMULA> "$formula_path"
 
 class Forego < Formula
-  homepage "https://github.com/bww/forego"
-  url "http://bww-artifacts.s3.amazonaws.com/forego/${release_version}/forego-${release_version}-${OS}-${ARCH}.tgz"
+  homepage "https://github.com/bww/${product}"
+  url "http://bww-artifacts.s3.amazonaws.com/${product}/${release_version}/${product}-${release_version}-${OS}-${ARCH}.tgz"
   sha256 "${sha256}"
   version "${release_version}"
   
   def install
-    bin.install "bin/forego"
+    bin.install "bin/${product}"
   end
 end
 FORMULA
