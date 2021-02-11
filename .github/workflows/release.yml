@@ -38,8 +38,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/linux_amd64/forego-${{ steps.vars.outputs.sha_short }}-linux-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.sha_short }}-linux-amd64.tgz
+          asset_path: ./target/linux_amd64/forego-${{ steps.vars.outputs.githash }}-linux-amd64.tgz
+          asset_name: forego-${{ steps.vars.outputs.githash }}-linux-amd64.tgz
           asset_content_type: application/x-tgz
       - name: Upload artifact
         id: upload-artifact-freebsd-amd64
@@ -48,8 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/freebsd_amd64/forego-${{ steps.vars.outputs.sha_short }}-freebsd-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.sha_short }}-freebsd-amd64.tgz
+          asset_path: ./target/freebsd_amd64/forego-${{ steps.vars.outputs.githash }}-freebsd-amd64.tgz
+          asset_name: forego-${{ steps.vars.outputs.githash }}-freebsd-amd64.tgz
           asset_content_type: application/x-tgz
       - name: Upload artifact
         id: upload-artifact-darwin-amd64
@@ -58,6 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/darwin_amd64/forego-${{ steps.vars.outputs.sha_short }}-darwin-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.sha_short }}-darwin-amd64.tgz
+          asset_path: ./target/darwin_amd64/forego-${{ steps.vars.outputs.githash }}-darwin-amd64.tgz
+          asset_name: forego-${{ steps.vars.outputs.githash }}-darwin-amd64.tgz
           asset_content_type: application/x-tgz
