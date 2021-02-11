@@ -2,7 +2,7 @@
 # the product we're building
 NAME := forego
 # the product's main package
-MAIN := ./src
+MAIN := ./forego
 
 # fix our gopath
 GOPATH := $(GOPATH):$(PWD)
@@ -29,7 +29,7 @@ PREFIX ?= /usr/local
 LATEST ?= latest
 
 # sources
-SRC = $(shell find src -name \*.go -not -path ./src/vendor -print)
+SRC = $(shell find $(MAIN) -name \*.go)
 
 .PHONY: all test clean install release build archive publish release formula
 
@@ -63,14 +63,14 @@ gate:
 release: gate test ## Build for all supported architectures
 	make publish GOOS=linux GOARCH=amd64
 	make publish GOOS=freebsd GOARCH=amd64
-	make publish formula GOOS=darwin GOARCH=amd64
+	make public formula GOOS=darwin GOARCH=amd64
 	@echo && echo "Tag this release:\n\t$ git commit -a -m \"Version $(VERSION)\" && git tag $(VERSION)" && echo
 
 install: build ## Build and install
 	install -m 0755 $(PRODUCT) $(PREFIX)/bin/
 
 test: ## Run tests
-	go test ./src/...
+	go test $(MAIN)/...
 
 clean: ## Delete the built product and any generated files
 	rm -rf $(TARGETS)
