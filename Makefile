@@ -48,11 +48,6 @@ $(RELEASE_PACKAGE): $(RELEASE_BINARY)
 
 archive: $(RELEASE_PACKAGE)
 
-formula: archive
-	mkdir -p $(RELEASE_BUILD)/formula && $(PWD)/build/update-formula -v $(VERSION) -o $(RELEASE_BUILD)/formula/forego.rb $(RELEASE_PACKAGE)
-	aws s3 cp --acl public-read $(RELEASE_BUILD)/formula/forego.rb s3://bww-artifacts/forego/$(LATEST)/forego.rb
-	aws s3 cp --acl public-read $(RELEASE_BUILD)/formula/forego.rb s3://bww-artifacts/forego/$(VERSION)/forego.rb
-
 install: build ## Build and install
 	install -m 0755 $(PRODUCT) $(PREFIX)/bin/
 
