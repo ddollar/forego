@@ -14,9 +14,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Build
         run: |
-          make archive GOOS=linux GOARCH=amd64
-          make archive GOOS=freebsd GOARCH=amd64
-          make archive GOOS=darwin GOARCH=amd64
+          make archive VERSION=${{ github.ref }} GOOS=linux GOARCH=amd64
+          make archive VERSION=${{ github.ref }} GOOS=freebsd GOARCH=amd64
+          make archive VERSION=${{ github.ref }} GOOS=darwin GOARCH=amd64
       - name: Setup variables
         id: vars
         run: echo "::set-output name=githash::$(git rev-parse --short HEAD)"
