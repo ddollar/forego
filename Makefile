@@ -31,7 +31,7 @@ LATEST ?= latest
 # sources
 SRC = $(shell find $(MAIN) -name \*.go)
 
-.PHONY: all test clean install release build archive publish release formula
+.PHONY: all test clean install build archive
 
 all: build
 

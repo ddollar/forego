@@ -6,16 +6,11 @@
 
 For your convenience, Forego can be installed via Homebrew. However you cannot install it along side the original Forego, from which this was forked.
 
-Install the latest version thusly:
+Install or upgrade the latest version thusly:
 
 ```
-$ brew install 'http://bww-artifacts.s3.amazonaws.com/forego/latest/forego.rb'
-```
-
-Upgrade (or uninstall) it as follows:
-
-```
-$ brew upgrade 'http://bww-artifacts.s3.amazonaws.com/forego/latest/forego.rb'
+$ brew install bww/stable/forego
+$ brew upgrade bww/stable/forego
 ```
 
 Uninstall as follows:
