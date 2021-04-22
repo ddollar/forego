@@ -123,7 +123,7 @@ func TestPortFromEnv(t *testing.T) {
 	os.Setenv("PORT", "4000")
 	port, err = basePort(env)
 	if err != nil {
-		t.Fatal("Can not get port: %s", err)
+		t.Fatalf("Can not get port: %s", err)
 	}
 	if port != 4000 {
 		t.Fatal("Base port should be 4000")
@@ -154,7 +154,7 @@ func TestConfigBeOverrideByForegoFile(t *testing.T) {
 	err := readConfigFile("./fixtures/configs/.forego", &procfile, &port, &concurrency, &gracetime)
 
 	if err != nil {
-		t.Fatalf("Cannot set default values from forego config file")
+		t.Fatal("Cannot set default values from forego config file")
 	}
 
 	if procfile != "Procfile.dev" {
@@ -162,14 +162,14 @@ func TestConfigBeOverrideByForegoFile(t *testing.T) {
 	}
 
 	if port != 15000 {
-		t.Fatal("port should be 15000, got %d", port)
+		t.Fatalf("port should be 15000, got %d", port)
 	}
 
 	if concurrency != "foo=2,bar=3" {
-		t.Fatal("concurrency should be 'foo=2,bar=3', got %s", concurrency)
+		t.Fatalf("concurrency should be 'foo=2,bar=3', got %s", concurrency)
 	}
 
 	if gracetime != 30 {
-		t.Fatal("gracetime should be 3, got %d", gracetime)
+		t.Fatalf("gracetime should be 3, got %d", gracetime)
 	}
 }

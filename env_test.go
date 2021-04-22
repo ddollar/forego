@@ -11,10 +11,10 @@ func TestMultipleEnvironmentFiles(t *testing.T) {
 	}
 
 	if env["env1"] == "" {
-		t.Fatalf("$env1 should be present and is not")
+		t.Fatal("$env1 should be present and is not")
 	}
 
 	if env["env2"] == "" {
-		t.Fatalf("$env2 should be present and is not")
+		t.Fatal("$env2 should be present and is not")
 	}
 }
