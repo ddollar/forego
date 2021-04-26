@@ -1,7 +1,7 @@
 BIN = forego
 SRC = $(shell find . -name '*.go')
 
-.PHONY: all build clean lint release test
+.PHONY: all build clean lint test
 
 all: build
 
@@ -12,9 +12,6 @@ clean:
 
 lint: $(SRC)
 	go fmt
-
-release:
-	bin/release
 
 test: lint build
 	go test -v -race -cover ./...

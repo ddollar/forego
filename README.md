@@ -6,10 +6,6 @@
 
 [Foreman](https://github.com/ddollar/foreman) in Go.
 
-### Installation
-
-[Downloads](https://dl.equinox.io/ddollar/forego/stable)
-
 ##### Compile from Source
 
     $ go get -u github.com/ddollar/forego
