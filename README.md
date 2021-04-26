@@ -1,9 +1,5 @@
 ## forego
 
-<a href="https://circleci.com/gh/ddollar/forego">
-  <img align="right" src="https://circleci.com/gh/ddollar/forego.svg?style=svg">
-</a>
-
 [Foreman](https://github.com/ddollar/foreman) in Go.
 
 ##### Compile from Source
