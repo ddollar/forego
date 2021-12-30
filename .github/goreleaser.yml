@@ -1,7 +1,7 @@
 # test this file with
 #   goreleaser --skip-publish --rm-dist --config .github/goreleaser.yml
 builds:
-  - main: ./main.go
+  - main: .
     env:
       - CGO_ENABLED=0
     ldflags:
@@ -14,6 +14,7 @@ builds:
       - amd64
       - arm
       - arm64
+      - 386
     goarm:
       - 6
       - 7
