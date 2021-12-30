@@ -1,5 +1,5 @@
 # test this file with
-#   goreleaser --skip-publish --rm-dist --config goreleaser.yml
+#   goreleaser --skip-publish --rm-dist --config .github/goreleaser.yml
 builds:
   - main: ./main.go
     env:
