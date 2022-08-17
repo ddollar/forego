@@ -1,0 +1,32 @@
+# test this file with
+#   goreleaser --skip-publish --rm-dist --config .github/goreleaser.yml
+builds:
+  - main: .
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm
+      - arm64
+      - 386
+    goarm:
+      - 6
+      - 7
+archives:
+  - format: gz
+    files:
+      - none*
+release:
+  prerelease: auto
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
