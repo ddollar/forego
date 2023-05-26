@@ -49,7 +49,8 @@ $(RELEASE_PACKAGE): $(RELEASE_BINARY)
 archive: $(RELEASE_PACKAGE)
 
 install: build ## Build and install
-	install -m 0755 $(PRODUCT) $(PREFIX)/bin/
+	@echo "Using sudo to install; you may be prompted for a password..."
+	sudo install -m 0755 $(PRODUCT) $(PREFIX)/bin/
 
 test: ## Run tests
 	go test $(MAIN)/...
