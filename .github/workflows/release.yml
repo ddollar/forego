@@ -6,20 +6,12 @@ on:
       - 'v*'  # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  build:
+  release:
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      artifact_upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Build
-        run: |
-          make archive VERSION=${{ github.ref }} GOOS=linux GOARCH=amd64
-          make archive VERSION=${{ github.ref }} GOOS=freebsd GOARCH=amd64
-          make archive VERSION=${{ github.ref }} GOOS=darwin GOARCH=amd64
-      - name: Setup variables
-        id: vars
-        run: echo "::set-output name=githash::$(git rev-parse --short HEAD)"
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -27,36 +19,45 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
+          release_name: ${{ github.ref }}
+          draft: true
           prerelease: false
+
+  artifacts:
+    needs: [ release ]
+    name: Build Artifacts
+    strategy:
+      matrix:
+        include:
+          - target: linux
+            arch: amd64
+            os: ubuntu-latest
+          - target: freebsd
+            arch: amd64
+            os: ubuntu-latest
+          - target: darwin
+            arch: amd64
+            os: macos-latest
+          - target: darwin
+            arch: arm64
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Build
+        env:
+          GOOS: ${{ matrix.target }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          make package VERSION=${{ github.ref }} PRODUCT=forego-${GITHUB_SHA}-${{ matrix.target }}-${{ matrix.arch }}
       - name: Upload artifact
         id: upload_artifact_linux_amd64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/linux_amd64/forego-${{ steps.vars.outputs.githash }}-linux-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.githash }}-linux-amd64.tgz
-          asset_content_type: application/x-tgz
-      - name: Upload artifact
-        id: upload_artifact_freebsd_amd64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/freebsd_amd64/forego-${{ steps.vars.outputs.githash }}-freebsd-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.githash }}-freebsd-amd64.tgz
-          asset_content_type: application/x-tgz
-      - name: Upload artifact
-        id: upload_artifact_darwin_amd64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/darwin_amd64/forego-${{ steps.vars.outputs.githash }}-darwin-amd64.tgz
-          asset_name: forego-${{ steps.vars.outputs.githash }}-darwin-amd64.tgz
+          upload_url: ${{ needs.release.outputs.artifact_upload_url }}
+          asset_path: ./target/forego-${{ github.sha }}-${{ matrix.target }}-${{ matrix.arch }}.tgz
+          asset_name: forego-${{ github.sha }}-${{ matrix.target }}-${{ matrix.arch }}.tgz
           asset_content_type: application/x-tgz
