@@ -50,7 +50,7 @@ jobs:
           GOOS: ${{ matrix.target }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          make archive VERSION=${{ github.ref }}
+          make archive GITHASH=${{ github.ref }}
       - name: Upload artifact
         id: upload_artifact_linux_amd64
         uses: actions/upload-release-asset@v1
