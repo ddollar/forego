@@ -11,6 +11,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const defaultPort = 5000
@@ -21,6 +23,7 @@ var flagConcurrency string
 var flagRestart bool
 var flagShutdownGraceTime int
 var envs envFiles
+var colorize bool
 
 var cmdStart = &Command{
 	Run:   runStart,
@@ -88,6 +91,7 @@ func init() {
 	cmdStart.Flag.IntVar(&flagShutdownGraceTime, "t", defaultShutdownGraceTime, "shutdown grace time")
 	err := readConfigFile(".forego", &flagProcfile, &flagPort, &flagConcurrency, &flagShutdownGraceTime)
 	handleError(err)
+	colorize = os.Getenv("NO_COLOR") == "" && terminal.IsTerminal(int(os.Stdout.Fd()))
 }
 
 func readConfigFile(config_path string, flagProcfile *string, flagPort *int, flagConcurrency *string, flagShutdownGraceTime *int) error {
@@ -275,7 +279,7 @@ func runStart(cmd *Command, args []string) {
 	handleError(err)
 
 	of := NewOutletFactory()
-	of.Padding = pf.LongestProcessName(concurrency)
+	of.LeftFormatter = fmt.Sprintf("%%-%ds | ", pf.LongestProcessName(concurrency))
 
 	f := &Forego{
 		outletFactory: of,

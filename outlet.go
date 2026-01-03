@@ -12,7 +12,7 @@ import (
 )
 
 type OutletFactory struct {
-	Padding int
+	LeftFormatter string
 
 	sync.Mutex
 }
@@ -77,17 +77,20 @@ func (of *OutletFactory) WriteLine(left, right string, leftC, rightC ct.Color, i
 	of.Lock()
 	defer of.Unlock()
 
-	ct.ChangeColor(leftC, true, ct.None, false)
-	formatter := fmt.Sprintf("%%-%ds | ", of.Padding)
-	fmt.Printf(formatter, left)
+	if colorize {
+		ct.ChangeColor(leftC, true, ct.None, false)
+	}
+	fmt.Printf(of.LeftFormatter, left)
 
-	if isError {
-		ct.ChangeColor(ct.Red, true, ct.None, true)
-	} else {
-		ct.ResetColor()
+	if colorize {
+		if isError {
+			ct.ChangeColor(rightC, true, ct.None, true)
+		} else {
+			ct.ResetColor()
+		}
 	}
 	fmt.Println(right)
-	if isError {
+	if colorize && isError {
 		ct.ResetColor()
 	}
 }
