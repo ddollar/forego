@@ -12,7 +12,7 @@
 
 ##### Compile from Source
 
-    $ go get -u github.com/ddollar/forego
+    $ go install github.com/ddollar/forego@latest
 
 ### Usage
 
