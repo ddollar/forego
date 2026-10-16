@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package main
@@ -13,7 +14,11 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 }
 
 func (p *Process) PlatformSpecificInit() {
-	// NOP on windows for now.
+	p.Dir = p.WorkDir
+	// cmd.exe expects its command string verbatim, not escaped as a Windows argv.
+	p.SysProcAttr = &syscall.SysProcAttr{
+		CmdLine: syscall.EscapeArg(p.Path) + " /S /C \"" + p.Command + "\"",
+	}
 	return
 }
 
