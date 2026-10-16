@@ -42,11 +42,8 @@ func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, 
 	for {
 		buf := make([]byte, 1024)
 
-		if n, err := reader.Read(buf); err != nil {
-			return
-		} else {
-			buf = buf[:n]
-		}
+		n, err := reader.Read(buf)
+		buf = buf[:n]
 
 		for {
 			i := bytes.IndexByte(buf, '\n')
@@ -60,6 +57,12 @@ func (of *OutletFactory) LineReader(wg *sync.WaitGroup, name string, index int, 
 		}
 
 		buffer.Write(buf)
+		if err != nil {
+			if buffer.Len() > 0 {
+				of.WriteLine(name, buffer.String(), color, ct.None, isError)
+			}
+			return
+		}
 	}
 }
 
